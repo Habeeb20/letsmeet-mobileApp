@@ -177,5 +177,10 @@ export const sendMessage = async (friendId, message, token) => {
 };
 
 
-
+// Get user ID by email
+export const getUserByEmail = async (email, token) => {
+  return api.get(`/api/dating/user-by-email?email=${encodeURIComponent(email)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
 export default api;

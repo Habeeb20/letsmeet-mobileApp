@@ -27,6 +27,7 @@ import colors from '../colors';
 import api from '../constants/api';
 import LoveLoader from './others/LoveLoader';
 import im from "../assets/images/alady.jpg"
+import CustomError from './others/customError';
 const { width, height } = Dimensions.get('window');
 
 const Dashboard = () => {
@@ -67,6 +68,7 @@ const Dashboard = () => {
         const likedResponse = await getLikedUsers(storedToken);
         setLikedUsers(likedResponse.data);
       } catch (err) {
+        router.push('/signin');
         setError(err.response?.data?.message || 'Failed to fetch data');
         console.error('Fetch error:', err);
       } finally {
@@ -129,14 +131,20 @@ const Dashboard = () => {
   const closeModal = () => {
     setSelectedUser(null);
   };
+    if (error) return <CustomError message={error} onRetry={() => setIsLoading(true)} />;
+  
 
   if (isLoading) return <LoveLoader visible={true} />;
   if (error) return (
     <View style={styles.noUsersContainer}>
-      <Text style={styles.error}>{error}</Text>
+    <View style={styles.content}>
+     <Text style={styles.error}>{error}</Text>
       <TouchableOpacity style={styles.refreshButton} onPress={() => setIsLoading(true)}>
         <Text style={styles.refreshButtonText}>Retry</Text>
       </TouchableOpacity>
+
+    </View>
+     
       <Footer style={styles.localFooter} />
     </View>
   );
@@ -598,6 +606,10 @@ const styles = StyleSheet.create({
   },
     contentContainer: {
     flex: 1,
+    justifyContent: 'space-between',
+  },
+  content:{
+  flex: 1,
     justifyContent: 'space-between',
   },
   scroll: {

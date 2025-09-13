@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginVertical: 15,
     borderTopWidth: 1,
-    borderTopColor: colors.textSecondary,
+    borderTopColor: colors.background,
   },
   navItem: {
     alignItems: "center",
