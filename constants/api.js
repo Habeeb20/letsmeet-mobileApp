@@ -1,9 +1,11 @@
 import axios from 'axios';
 import Constants from 'expo-constants';
 
-const API_URL = "https://datingmobileappbackend.onrender.com/";
+
+// const API_URL = "https://dating-mobileapp-backend1.onrender.com"
+
 // const API_URL = "http://localhost:5000";
-// const API_URL = 'http://172.20.10.6:5000';
+const API_URL = 'http://172.20.10.6:5000';
 console.log('api.js: API_URL:', API_URL);
 
 const api = axios.create({
@@ -95,22 +97,85 @@ export const updateProfile = async (updateData, token) => {
 };
 
 
-export const getAllUsers = async (token) => {
-  return api.get('/api/dating', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+export const getAllUsers = async () => {
+  return api.get('/api/dating');
+};
+
+
+export const getFilteredUsers = async (email, state = null) => {
+  const params = { email };
+  if (state) {
+    params.state = state;
+  }
+  return api.get('/api/dating/filtered', { params });
+};
+
+
+// Like a user
+export const likeUser = async (userId, token) => {
+  return api.post(`/api/dating/${userId}/like`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
   });
 };
 
-export const getFilteredUsers = async (token, state = null) => {
-  const params = state ? { state } : {};
-  return api.get('/api/dating/filtered', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    params,
+// Pass a user
+export const passUser = async (userId, token) => {
+  return api.post(`/api/dating/${userId}/pass`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+// Accept a like
+export const acceptLike = async (userId, token) => {
+  return api.post(`/api/dating/${userId}/accept`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Reject a like
+export const rejectLike = async (userId, token) => {
+  return api.post(`/api/dating/${userId}/reject`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Get liked users
+export const getLikedUsers = async (token) => {
+  return api.get('/api/dating/liked', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Get users who liked the logged-in user
+export const getLikedBy = async (token) => {
+  return api.get('/api/dating/liked-by', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+
+
+// Get friends
+export const getFriends = async (token) => {
+  return api.get('/api/dating/friends', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Get chat history
+export const getChatHistory = async (friendId, token) => {
+  return api.get(`/api/dating/${friendId}/chat`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Send a message
+export const sendMessage = async (friendId, message, token) => {
+  return api.post(`/api/dating/${friendId}/chat`, { message }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+
 
 export default api;

@@ -14,17 +14,22 @@ import {
 } from "react-native";
 import colors from "./../colors"
 
+
 import { useRouter } from "expo-router";
 import { submitLogin } from "../constants/api";
-
-import { withKeyboardAvoiding } from "./utils/keyboardAvoiding";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { withKeyboardAvoiding } from "./utils/keyboardAvoiding";
 
+import { Link } from "expo-router";
 
 const Signin = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleSignup = () => {
+    router.push('/signup')
+  }
 
   const handleNext = async () => {
     if (!email.trim()) {
@@ -34,6 +39,7 @@ const Signin = () => {
     setIsLoading(true);
     try {
       const response = await submitLogin({ email });
+      await AsyncStorage.setItem('userEmail', email);
       console.log(response, "login response");
       router.push({ pathname: "/loginToken", params: { email } });
     } catch (error) {
@@ -76,6 +82,12 @@ const Signin = () => {
           <Text style={styles.buttonText}>Next</Text>
         )}
       </TouchableOpacity>
+    
+<Link href="/signup" asChild>
+  <Text style={styles.signupButton} className="signup-link">
+    New to Let's Meet? Sign up
+  </Text>
+</Link>
     </View>,
     {
       behavior: Platform.OS === "ios" ? "padding" : "height",
@@ -136,6 +148,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  signupButton:{
+    marginTop:25
   },
 });
 

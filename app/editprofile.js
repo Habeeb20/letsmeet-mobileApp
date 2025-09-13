@@ -95,10 +95,10 @@ const EditProfile = () => {
         quality: 1,
       });
       if (!result.canceled) {
-        const file = result.assets[0];
+        const file = result?.assets[0];
         const data = new FormData();
         data.append("file", {
-          uri: file.uri,
+          uri: file?.uri,
           type: file.type || "image/jpeg",
           name: file.fileName || "image.jpg",
         });

@@ -60,6 +60,9 @@ export default function Layout() {
       <Stack.Screen name="mydata" options={{ headerShown: false }} />
       <Stack.Screen name="discover" options={{ headerShown: false }} />
       <Stack.Screen name="editprofile" options={{ headerShown: false }} />
+      <Stack.Screen name="likedBy" options={{ headerShown: false }} />
+      <Stack.Screen name="friends" options={{ headerShown: false }} />
+      <Stack.Screen name="likedusers" options={{ headerShown: false }} />
 
     </Stack>
   );

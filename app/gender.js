@@ -33,7 +33,7 @@ const Gender = ({ navigation }) => {
           () =>
             router.push({
               pathname: `/${response.data.nextStep}`,
-              params: email,
+              params:{email},
             }),
           1500
         );
@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     paddingBottom: 40,
+    marginTop:15
   },
   title: {
     fontSize: 32,
@@ -124,7 +125,8 @@ const styles = StyleSheet.create({
   },
   genderOptions: {
     width: "85%",
-    marginBottom: 30,
+    marginBottom: 15,
+    marginTop:25
   },
   genderButton: {
     backgroundColor: "rgba(255, 255, 255, 0.9)",

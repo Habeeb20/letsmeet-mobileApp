@@ -21,9 +21,15 @@ const matches = () => {
       <View style={styles.topNav}>
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => router.push("/matchHistory")}
+          onPress={() => router.push("/likedusers")}
         >
           <Text style={styles.navText}>History</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/likedBy")}
+        >
+          <Text style={styles.navText}>Liked-by</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
@@ -66,6 +72,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     backgroundColor: colors.secondary,
     paddingVertical: 10,
+    marginTop:40,
     borderBottomWidth: 1,
     borderBottomColor: colors.textSecondary,
   },

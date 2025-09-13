@@ -19,9 +19,11 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/myLogo.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "package": "com.ademola.letsmeet"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.ademolawaliyu.letsmeet"
     },
     "web": {
       "bundler": "metro",

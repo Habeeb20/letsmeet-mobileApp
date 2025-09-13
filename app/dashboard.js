@@ -1,5 +1,11 @@
 
-import React, { useState, useEffect } from "react";
+
+
+
+
+
+
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,198 +14,610 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
-import Icon from "react-native-vector-icons/FontAwesome";
-import api from "../constants/api";
-import { getFilteredUsers } from "../constants/api";
-import Footer from "./others/Footer"
-import colors from "./../colors"
-import LoveLoader from "./others/LoveLoader";
-import { useLocalSearchParams } from "expo-router";
+  ImageBackground,
+  FlatList,
+  Modal,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { getFilteredUsers, likeUser, getLikedUsers } from '../constants/api';
+import Footer from './others/Footer';
+import colors from '../colors';
+import api from '../constants/api';
+import LoveLoader from './others/LoveLoader';
+import im from "../assets/images/alady.jpg"
+const { width, height } = Dimensions.get('window');
 
-
-const { width } = Dimensions.get("window");
 const Dashboard = () => {
-  const { token } = useLocalSearchParams();
+  const { email } = useLocalSearchParams();
   const router = useRouter();
-
   const [users, setUsers] = useState([]);
+  const [likedUsers, setLikedUsers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigateToScreen = (screen) => {
-    router.push(`/${screen}`);
-  };
+  const [token, setToken] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-    useEffect(() => {
-    const fetchUsers = async () => {
+
+    const pastelColors = [
+    '#FFF3CD', // Light yellow
+    '#D4EDDA', // Light green
+    '#F8D7DA', // Light pink
+    '#D1ECF1', // Light blue
+  ];
+
+  useEffect(() => {
+    const fetchData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const token = await AsyncStorage.getItem("authToken");
-        if (!token) {
-          router.push("/signin");
+        const storedEmail = await AsyncStorage.getItem('userEmail') || email;
+        const storedToken = await AsyncStorage.getItem('authToken');
+        if (!storedEmail || !storedToken) {
+          router.push('/signin');
           return;
         }
-        const response = await getFilteredUsers(token);
-        setUsers(response.data);
+        setToken(storedToken);
+        // Fetch filtered users
+        const response = await getFilteredUsers(storedEmail);
+        setUsers(response.data.data);
+        // Fetch liked users
+        const likedResponse = await getLikedUsers(storedToken);
+        setLikedUsers(likedResponse.data);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch users");
+        setError(err.response?.data?.message || 'Failed to fetch data');
+        console.error('Fetch error:', err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchUsers();
-  }, []);
+    fetchData();
+  }, [email]);
 
-
-   const handleCancel = () => {
+  const handleCancel = () => {
     if (currentIndex < users.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      setCurrentIndex(0); // Loop back to start if at the end
+      setCurrentIndex(0);
     }
-    logVisit(users[currentIndex]._id);
+    logVisit(users[currentIndex]?._id);
   };
 
-  const handleLike = () => {
-    // Implement like logic (e.g., save to favorites in backend)
-    console.log("Liked user:", users[currentIndex]?._id);
-    if (currentIndex < users.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      setCurrentIndex(0); // Loop back to start if at the end
+  const handleLike = async () => {
+    const userId = users[currentIndex]?._id;
+    if (userId && token) {
+      try {
+        await likeUser(userId, token);
+        // Update liked users list
+        setLikedUsers([...likedUsers, users[currentIndex]]);
+        if (currentIndex < users.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+        } else {
+          setCurrentIndex(0);
+        }
+        logVisit(userId);
+      } catch (err) {
+        setError('Failed to like user');
+        console.error('Like error:', err);
+      }
     }
-    logVisit(users[currentIndex]._id);
   };
 
-
-  
   const logVisit = async (userId) => {
     try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (token) {
-        await api.post(`/api/dating/${userId}/visit`, {}, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const storedEmail = await AsyncStorage.getItem('userEmail') || email;
+      if (storedEmail && userId && token) {
+        await api.post(
+          `/api/dating/${userId}/visit`,
+          { email: storedEmail },
+          {
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          }
+        );
       }
     } catch (err) {
-      console.error("Failed to log visit:", err);
+      console.error('Failed to log visit:', err);
     }
+  };
+
+  const viewUserDetails = (user) => {
+    setSelectedUser(user);
+  };
+
+  const closeModal = () => {
+    setSelectedUser(null);
   };
 
   if (isLoading) return <LoveLoader visible={true} />;
-  if (error) return <Text style={styles.error}>{error}</Text>;
+  if (error) return (
+    <View style={styles.noUsersContainer}>
+      <Text style={styles.error}>{error}</Text>
+      <TouchableOpacity style={styles.refreshButton} onPress={() => setIsLoading(true)}>
+        <Text style={styles.refreshButtonText}>Retry</Text>
+      </TouchableOpacity>
+      <Footer style={styles.localFooter} />
+    </View>
+  );
   if (!users.length) {
     return (
       <View style={styles.noUsersContainer}>
-        <Icon name="heart" size={50} color={colors.primary} style={styles.heartIcon} />
+      <View style={styles.contentContainer}>
+       <Icon name='heart' size={50} color={colors.primary} style={styles.heartIcon} />
         <Text style={styles.noUsersText}>No Matches Yet!</Text>
         <Text style={styles.noUsersSubText}>
           Swipe right to like or left to pass. Find your perfect match!
         </Text>
-        <Icon name="heart" size={40} color={colors.primary} style={[styles.heartIcon, { marginTop: 20 }]} />
+        <Icon name='heart' size={40} color={colors.primary} style={[styles.heartIcon, { marginTop: 20 }]} />
         <TouchableOpacity style={styles.refreshButton} onPress={() => setIsLoading(true)}>
           <Text style={styles.refreshButtonText}>Refresh</Text>
         </TouchableOpacity>
-     <Footer
-      style={styles.localFooter}
-    />
+
+      </View>
+       
+        <Footer style={styles.localFooter} />
       </View>
     );
   }
 
   const currentUser = users[currentIndex];
-
-
+  // const backgroundImage =  im;
+  const backgroundImage = currentUser?.profilePicture
+    ? { uri: currentUser.profilePicture }
+    : im;
 
   return (
-      <View style={styles.container}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.card}>
-          <Image
-            source={
-              currentUser?.profilePicture
-                ? { uri: currentUser.profilePicture }
-                : { uri: "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=800" }
-            }
-            style={styles.profileImage}
-            defaultSource={require("../assets/images/datingLogo.jpeg")}
-          />
-          <View style={styles.header}>
-            <Text style={styles.name}>{`${currentUser.firstName} ${currentUser.lastName}`}</Text>
-            <Text style={styles.age}>{currentUser.age}</Text>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <ImageBackground
+          source={backgroundImage}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+          defaultSource={im}
+        >
+          <View style={styles.overlay}>
+            <Image
+              source={backgroundImage}
+              style={styles.profileImage}
+              defaultSource={im}
+            />
+            <View style={styles.header}>
+              <Text style={styles.name}>{`${currentUser.firstName} ${currentUser.lastName}`}</Text>
+              <Text style={styles.age}>{currentUser.age || 'N/A'}</Text>
+            </View>
+            <View style={styles.details}>
+              <Text style={styles.detailText}>
+                Ethnicity: {currentUser.ethnicity?.[0] || 'Not specified'}
+              </Text>
+              <Text style={styles.detailText}>
+                Faith: {currentUser.myFaith?.[0] || 'Not specified'}
+              </Text>
+              <Text style={styles.detailText}>
+                State: {currentUser.state || 'Not specified'}
+              </Text>
+            </View>
+            <View style={styles.actionButtons}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancel}
+                accessibilityLabel="Pass on user"
+              >
+                <Icon name='times' size={30} color='#FF4D4D' />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.likeButton}
+                onPress={handleLike}
+                accessibilityLabel="Like user"
+              >
+                <Icon name='star' size={30} color='#FFD700' />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.details}>
-            <Text style={styles.detailText}>Ethnicity: {currentUser.ethnicity[0] || "Not specified"}</Text>
-            <Text style={styles.detailText}>Faith: {currentUser.myFaith[0] || "Not specified"}</Text>
-            <Text style={styles.detailText}>State: {currentUser.state || "Not specified"}</Text>
-          </View>
-          <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-              <Icon name="times" size={30} color="#FF4D4D" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.likeButton} onPress={handleLike}>
-              <Icon name="star" size={30} color="#FFD700" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.additionalDetails}>
+        </ImageBackground>
+        {/* <View style={styles.additionalDetails}>
           <Text style={styles.sectionTitle}>About Me</Text>
-          {currentUser.aboutMe.map((item, index) => (
+          {currentUser.aboutMe?.map((item, index) => (
             <Text key={index} style={styles.detailText}>{item}</Text>
-          ))}
+          )) || <Text style={styles.detailText}>No info available</Text>}
           <Text style={styles.sectionTitle}>Interests</Text>
-          {currentUser.interests.map((item, index) => (
+          {currentUser.interests?.map((item, index) => (
             <Text key={index} style={styles.detailText}>{item}</Text>
-          ))}
+          )) || <Text style={styles.detailText}>No interests available</Text>}
           <Text style={styles.sectionTitle}>Languages</Text>
-          {currentUser.languages.map((item, index) => (
+          {currentUser.languages?.map((item, index) => (
             <Text key={index} style={styles.detailText}>{item}</Text>
-          ))}
+          )) || <Text style={styles.detailText}>No languages available</Text>}
           <Text style={styles.sectionTitle}>Personality</Text>
-          {currentUser.personality.map((item, index) => (
+          {currentUser.personality?.map((item, index) => (
             <Text key={index} style={styles.detailText}>{item}</Text>
-          ))}
+          )) || <Text style={styles.detailText}>No personality info available</Text>}
           <Text style={styles.sectionTitle}>Bio</Text>
-          <Text style={styles.detailText}>{currentUser.bio || "No bio available"}</Text>
+          <Text style={styles.detailText}>{currentUser.bio || 'No bio available'}</Text>
           <Text style={styles.sectionTitle}>Education</Text>
-          <Text style={styles.detailText}>{currentUser.education || "Not specified"}</Text>
+          <Text style={styles.detailText}>{currentUser.education || 'Not specified'}</Text>
           <Text style={styles.sectionTitle}>Gallery</Text>
-          {currentUser.gallery.length > 0 ? (
+          {currentUser.gallery?.length > 0 ? (
             currentUser.gallery.map((url, index) => (
-              <Image key={index} source={{ uri: url }} style={styles.galleryImage} />
+              <Image
+                key={index}
+                source={{ uri: url }}
+                style={styles.galleryImage}
+                defaultSource={require('../assets/images/alady.jpg')}
+              />
             ))
           ) : (
             <Text style={styles.detailText}>No gallery images</Text>
           )}
+        </View> */}
+               <View style={styles.additionalDetails}>
+          <Text style={styles.sectionTitle}>About Me</Text>
+          {currentUser.aboutMe?.length > 0 ? (
+            <FlatList
+              data={currentUser.aboutMe}
+              horizontal
+              keyExtractor={(item, index) => `about-${index}`}
+              renderItem={({ item, index }) => (
+                <View
+                  style={[
+                    styles.itemContainer,
+                    { backgroundColor: pastelColors[index % pastelColors.length] },
+                  ]}
+                >
+                  <Text style={styles.itemText}>{item}</Text>
+                </View>
+              )}
+              showsHorizontalScrollIndicator={false}
+            />
+          ) : (
+            <Text style={styles.detailText}>No info available</Text>
+          )}
+          <Text style={styles.sectionTitle}>Interests</Text>
+          {currentUser.interests?.length > 0 ? (
+            <FlatList
+              data={currentUser.interests}
+              horizontal
+              keyExtractor={(item, index) => `interest-${index}`}
+              renderItem={({ item, index }) => (
+                <View
+                  style={[
+                    styles.itemContainer,
+                    { backgroundColor: pastelColors[index % pastelColors.length] },
+                  ]}
+                >
+                  <Text style={styles.itemText}>{item}</Text>
+                </View>
+              )}
+              showsHorizontalScrollIndicator={false}
+            />
+          ) : (
+            <Text style={styles.detailText}>No interests available</Text>
+          )}
+          <Text style={styles.sectionTitle}>Languages</Text>
+          {currentUser.languages?.length > 0 ? (
+            <FlatList
+              data={currentUser.languages}
+              horizontal
+              keyExtractor={(item, index) => `language-${index}`}
+              renderItem={({ item, index }) => (
+                <View
+                  style={[
+                    styles.itemContainer,
+                    { backgroundColor: pastelColors[index % pastelColors.length] },
+                  ]}
+                >
+                  <Text style={styles.itemText}>{item}</Text>
+                </View>
+              )}
+              showsHorizontalScrollIndicator={false}
+            />
+          ) : (
+            <Text style={styles.detailText}>No languages available</Text>
+          )}
+          <Text style={styles.sectionTitle}>Personality</Text>
+          {currentUser.personality?.length > 0 ? (
+            <FlatList
+              data={currentUser.personality}
+              horizontal
+              keyExtractor={(item, index) => `personality-${index}`}
+              renderItem={({ item, index }) => (
+                <View
+                  style={[
+                    styles.itemContainer,
+                    { backgroundColor: pastelColors[index % pastelColors.length] },
+                  ]}
+                >
+                  <Text style={styles.itemText}>{item}</Text>
+                </View>
+              )}
+              showsHorizontalScrollIndicator={false}
+            />
+          ) : (
+            <Text style={styles.detailText}>No personality info available</Text>
+          )}
+          <Text style={styles.sectionTitle}>Bio</Text>
+          <Text style={styles.detailText}>{currentUser.bio || 'No bio available'}</Text>
+          <Text style={styles.sectionTitle}>Education</Text>
+          <Text style={styles.detailText}>{currentUser.education || 'Not specified'}</Text>
+          <Text style={styles.sectionTitle}>Gallery</Text>
+          {currentUser.gallery?.length > 0 ? (
+            currentUser.gallery.map((url, index) => (
+              <Image
+                key={index}
+                source={{ uri: url }}
+                style={styles.galleryImage}
+                defaultSource={im}
+              />
+            ))
+          ) : (
+            <Image
+              source={im}
+              style={styles.galleryImage}
+              defaultSource={im}
+            />
+          )}
         </View>
+        {/* Liked Users Section */}
+        <View style={styles.additionalDetails}>
+          <Text style={styles.sectionTitle}>Users You Liked</Text>
+          {likedUsers.length > 0 ? (
+            <FlatList
+              data={likedUsers}
+              horizontal
+              keyExtractor={(item) => item._id}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => viewUserDetails(item)}>
+                  <Image
+                    source={item.profilePicture ? { uri: item.profilePicture } : require('../assets/images/alady.jpg')}
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: 40,
+                      marginHorizontal: 10,
+                      borderWidth: 2,
+                      borderColor: colors.primary,
+                    }}
+                    defaultSource={im}
+                  />
+                  <Text style={{
+                    fontSize: 14,
+                    color: colors.textPrimary,
+                    textAlign: 'center',
+                    marginTop: 5,
+                  }}>{`${item.firstName} ${item.lastName}`}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          ) : (
+            <Text style={styles.detailText}>No users liked yet</Text>
+          )}
+        </View>
+        <View style={styles.footerSpacer} />
       </ScrollView>
-      <Footer />
+      {/* User Details Modal */}
+      <Modal
+        visible={!!selectedUser}
+        animationType="slide"
+        onRequestClose={closeModal}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: '#F5F5F5',
+          padding: 20,
+        }}>
+          <ScrollView>
+            {selectedUser && (
+              <>
+                <Image
+                  source={selectedUser.profilePicture ? { uri: selectedUser.profilePicture } : require('../assets/images/alady.jpg')}
+                  style={{
+                    width: 150,
+                    height: 150,
+                    borderRadius: 75,
+                    alignSelf: 'center',
+                    marginBottom: 20,
+                    borderWidth: 3,
+                    borderColor: colors.primary,
+                  }}
+                  defaultSource={im}
+                />
+                <Text style={{
+                  fontSize: 24,
+                  fontWeight: '700',
+                  color: colors.textPrimary,
+                  textAlign: 'center',
+                  marginBottom: 10,
+                }}>{`${selectedUser.firstName} ${selectedUser.lastName}`}</Text>
+                <Text style={{
+                  fontSize: 16,
+                  color: colors.textSecondary,
+                  marginVertical: 5,
+                  textAlign: 'center',
+                }}>Age: {selectedUser.age || 'N/A'}</Text>
+                <Text style={{
+                  fontSize: 16,
+                  color: colors.textSecondary,
+                  marginVertical: 5,
+                  textAlign: 'center',
+                }}>Ethnicity: {selectedUser.ethnicity?.[0] || 'Not specified'}</Text>
+                <Text style={{
+                  fontSize: 16,
+                  color: colors.textSecondary,
+                  marginVertical: 5,
+                  textAlign: 'center',
+                }}>Faith: {selectedUser.myFaith?.[0] || 'Not specified'}</Text>
+                <Text style={{
+                  fontSize: 16,
+                  color: colors.textSecondary,
+                  marginVertical: 5,
+                  textAlign: 'center',
+                }}>State: {selectedUser.state || 'Not specified'}</Text>
+                <Text style={{
+                  fontSize: 16,
+                  color: colors.textSecondary,
+                  marginVertical: 5,
+                  textAlign: 'center',
+                }}>Bio: {selectedUser.bio || 'No bio available'}</Text>
+                <Text style={{
+                  fontSize: 16,
+                  color: colors.textSecondary,
+                  marginVertical: 5,
+                  textAlign: 'center',
+                }}>Education: {selectedUser.education || 'Not specified'}</Text>
+                <Text style={styles.sectionTitle}>About Me</Text>
+                {selectedUser.aboutMe?.length > 0 ? (
+                  <FlatList
+                    data={selectedUser.aboutMe}
+                    horizontal
+                    keyExtractor={(item, index) => `modal-about-${index}`}
+                    renderItem={({ item, index }) => (
+                      <View
+                        style={[
+                          styles.itemContainer,
+                          { backgroundColor: pastelColors[index % pastelColors.length] },
+                        ]}
+                      >
+                        <Text style={styles.itemText}>{item}</Text>
+                      </View>
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                  />
+                ) : (
+                  <Text style={{
+                    fontSize: 16,
+                    color: colors.textSecondary,
+                    marginVertical: 5,
+                    textAlign: 'center',
+                  }}>No info available</Text>
+                )}
+                      {selectedUser.interests?.length > 0 ? (
+                  <FlatList
+                    data={selectedUser.interests}
+                    horizontal
+                    keyExtractor={(item, index) => `modal-interest-${index}`}
+                    renderItem={({ item, index }) => (
+                      <View
+                        style={[
+                          styles.itemContainer,
+                          { backgroundColor: pastelColors[index % pastelColors.length] },
+                        ]}
+                      >
+                        <Text style={styles.itemText}>{item}</Text>
+                      </View>
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                  />
+                ) : (
+                  <Text style={{
+                    fontSize: 16,
+                    color: colors.textSecondary,
+                    marginVertical: 5,
+                    textAlign: 'center',
+                  }}>No interests available</Text>
+                )}
+                <Text style={styles.sectionTitle}>Languages</Text>
+                {selectedUser.languages?.map((item, index) => (
+                  <Text key={index} style={{
+                    fontSize: 16,
+                    color: colors.textSecondary,
+                    marginVertical: 5,
+                    textAlign: 'center',
+                  }}>{item}</Text>
+                )) || <Text style={{
+                  fontSize: 16,
+                  color: colors.textSecondary,
+                  marginVertical: 5,
+                  textAlign: 'center',
+                }}>No languages available</Text>}
+                <Text style={styles.sectionTitle}>Personality</Text>
+                {selectedUser.personality?.map((item, index) => (
+                  <Text key={index} style={{
+                    fontSize: 16,
+                    color: colors.textSecondary,
+                    marginVertical: 5,
+                    textAlign: 'center',
+                  }}>{item}</Text>
+                )) || <Text style={{
+                  fontSize: 16,
+                  color: colors.textSecondary,
+                  marginVertical: 5,
+                  textAlign: 'center',
+                }}>No personality info available</Text>}
+                <Text style={styles.sectionTitle}>Gallery</Text>
+                {selectedUser.gallery?.length > 0 ? (
+                  selectedUser.gallery.map((url, index) => (
+                    <Image
+                      key={index}
+                      source={{ uri: url }}
+                      style={styles.galleryImage}
+                      defaultSource={im}
+                    />
+                  ))
+                ) : (
+                  <Text style={{
+                    fontSize: 16,
+                    color: colors.textSecondary,
+                    marginVertical: 5,
+                    textAlign: 'center',
+                  }}>No gallery images</Text>
+                )}
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: colors.primary,
+                    padding: 12,
+                    borderRadius: 10,
+                    alignSelf: 'center',
+                    marginTop: 20,
+                  }}
+                  onPress={closeModal}
+                >
+                  <Text style={{
+                    color: colors.buttonText,
+                    fontSize: 16,
+                    fontWeight: '500',
+                  }}>Close</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </ScrollView>
+        </View>
+      </Modal>
+      <Footer style={styles.localFooter} />
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: '#F5F5F5',
   },
-  scroll: { flex: 1 },
-  scrollContent: { alignItems: "center", padding: 20 },
-  card: {
-    width: width - 40,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
-    alignItems: "center",
+    contentContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    alignItems: 'center',
+  },
+  backgroundImage: {
+    width: width,
+    height: height, // Full screen height
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Light overlay for text readability
   },
   profileImage: {
     width: 200,
@@ -210,49 +628,58 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "baseline",
+    flexDirection: 'row',
+    alignItems: 'baseline',
     marginBottom: 10,
   },
   name: {
     fontSize: 28,
-    fontWeight: "700",
-    color: colors.textPrimary,
+    fontWeight: '700',
+    color: '#FFFFFF', // White for contrast
     marginRight: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   age: {
     fontSize: 20,
-    color: colors.primary,
-    fontWeight: "600",
+    color: '#FFFFFF',
+    fontWeight: '600',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   details: {
     marginBottom: 20,
+    alignItems: 'center',
   },
   detailText: {
     fontSize: 16,
-    color: colors.textSecondary,
+    color: '#191717FF',
     marginVertical: 5,
+    textShadowRadius: 2,
   },
   actionButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    paddingHorizontal: 20,
   },
   cancelButton: {
-    backgroundColor: "#FFE6E6",
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent for buttons
     borderRadius: 50,
     padding: 15,
-    shadowColor: "#FF4D4D",
+    shadowColor: '#FF4D4D',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 4,
   },
   likeButton: {
-    backgroundColor: "#FFF3E0",
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 50,
     padding: 15,
-    shadowColor: "#FFD700",
+    shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -260,14 +687,15 @@ const styles = StyleSheet.create({
   },
   additionalDetails: {
     width: width - 40,
-    backgroundColor: "#FAFAFA",
+    backgroundColor: '#FAFAFA',
     borderRadius: 15,
     padding: 15,
     marginTop: 20,
+    marginBottom: 100,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: '600',
     color: colors.textPrimary,
     marginTop: 15,
     marginBottom: 10,
@@ -280,21 +708,21 @@ const styles = StyleSheet.create({
   },
   noUsersContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5F5F5",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
     padding: 20,
   },
   noUsersText: {
     fontSize: 24,
-    fontWeight: "700",
+    fontWeight: '700',
     color: colors.textPrimary,
     marginVertical: 10,
   },
   noUsersSubText: {
     fontSize: 16,
     color: colors.textSecondary,
-    textAlign: "center",
+    textAlign: 'center',
     marginBottom: 20,
   },
   heartIcon: {
@@ -304,66 +732,53 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     padding: 12,
     borderRadius: 10,
-   
   },
   refreshButtonText: {
     color: colors.buttonText,
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   error: {
-    flex: 1,
-    textAlign: "center",
-    color: "#FF4D4D",
+    textAlign: 'center',
+    color: '#FF4D4D',
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: '500',
     marginTop: 20,
   },
-
-localFooter: {
-    position: "absolute",
+  localFooter: {
+    position: 'absolute',
     bottom: 0,
-    width: "100%",
-    backgroundColor: "#E0E0E0", // Light gray to match the page theme
+    width: '100%',
+    backgroundColor: '#E0E0E0',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,
-  padding:20,
-
+    padding: 20,
+  },
+  footerSpacer: {
+    height: 80,
+  },
+  itemContainer: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    marginRight: 10,
+    marginVertical: 5,
+  },
+  itemText: {
+    fontSize: 14,
+    color: colors.textPrimary,
+    fontWeight: '500',
   },
 });
 
 export default Dashboard;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

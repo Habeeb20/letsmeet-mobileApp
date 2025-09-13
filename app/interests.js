@@ -12,10 +12,11 @@ import { submitInterests } from '../constants/api';
 
 const Interests = ({ navigation }) => {
   const router = useRouter();
-  const { email } = useLocalSearchParams(); // Retrieve email from route params
+  const { email } = useLocalSearchParams(); 
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log(email, "email")
   const interestOptions = [
     'Music', 'Travel', 'Food', 'Sports', 'Movies', 'Gaming', 'Art', 'Fitness',
   ];
@@ -36,7 +37,7 @@ const Interests = ({ navigation }) => {
     setIsLoading(true);
     try {
       await submitInterests(email, selectedInterests);
-      router.push({ pathname: '/contacts', params: { email } });
+      router.push({ pathname: '/signin', params: { email } });
     } catch (error) {
       console.error('Failed to save interests:', error);
       Alert.alert('Error', error.response?.data?.message || 'Failed to save interests');
