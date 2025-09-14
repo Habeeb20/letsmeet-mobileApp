@@ -183,4 +183,13 @@ export const getUserByEmail = async (email, token) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+
+///get the user that visit the user profile
+
+export const visitors = async(token) => {
+   return api.get('/api/dating/visitors', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
 export default api;

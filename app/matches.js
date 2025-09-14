@@ -218,9 +218,9 @@ const Matches = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => router.push("/favorites")}
+          onPress={() => router.push("/visitorScreen")}
         >
-          <Icon name="star" size={20} color={colors.textPrimary} />
+       <Text style={styles.navText}>visited you</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}

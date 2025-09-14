@@ -63,6 +63,9 @@ export default function Layout() {
       <Stack.Screen name="likedBy" options={{ headerShown: false }} />
       <Stack.Screen name="friends" options={{ headerShown: false }} />
       <Stack.Screen name="likedusers" options={{ headerShown: false }} />
+      
+      <Stack.Screen name="visitorScreen" options={{ headerShown: false }} />
+
 
     </Stack>
   );
