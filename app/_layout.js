@@ -24,7 +24,7 @@ export default function Layout() {
           setIsAuthenticated(true);
           router.replace("/dashboard");
         } else {
-          router.replace("/signin");
+          router.replace("/onboarding1");
         }
       } catch (err) {
         console.error("Auth check error:", err);
@@ -40,10 +40,12 @@ export default function Layout() {
 
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="onboarding1" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+     <Stack.Screen name="onboarding1" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding2" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding3" options={{ headerShown: false }} />
+  
+     
       <Stack.Screen name="signup" options={{ headerShown: false }} />
       <Stack.Screen name="signin" options={{ headerShown: false }} />
       <Stack.Screen name="emailinput" options={{ headerShown: false }} />
@@ -63,6 +65,7 @@ export default function Layout() {
       <Stack.Screen name="likedBy" options={{ headerShown: false }} />
       <Stack.Screen name="friends" options={{ headerShown: false }} />
       <Stack.Screen name="likedusers" options={{ headerShown: false }} />
+      <Stack.Screen name="favorite" options={{ headerShown: false }} />
       
       <Stack.Screen name="visitorScreen" options={{ headerShown: false }} />
 

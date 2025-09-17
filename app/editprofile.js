@@ -989,7 +989,7 @@ const handleGalleryUpload = async () => {
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {loading && <LoveLoader />}
         <LinearGradient
-          colors={['#E59898FF', '#FF6A53FF']}
+          colors={['#FF4D4D', '#FF4D4D']}
           style={styles.headerContainer}
         >
           <Text style={styles.title}>Edit Your Profile</Text>
@@ -1087,12 +1087,12 @@ const handleGalleryUpload = async () => {
           />
         </Animated.View>
         {[
-          { field: 'interests', options: interestOptions, gradient: ['#4ECDC4', '#45B7D1'] },
-          { field: 'aboutMe', options: aboutMeOptions, gradient: ['#B2C3C2FF', '#8B998FFF'] },
-          { field: 'myFaith', options: myFaithOptions, gradient: ['#7A736AFF', '#928583FF'] },
-          { field: 'personality', options: personalityOptions, gradient: ['#6B7280', '#9CA3AF'] },
-          { field: 'languages', options: languagesOptions, gradient: ['#B8A5AFFF', '#AC95A2FF'] },
-          { field: 'ethnicity', options: ethnicityOptions, gradient: ['#60A5FA', '#3B82F6'] },
+          { field: 'interests', options: interestOptions, gradient: ["#F5F5F5", "#F5F5F5",] },
+          { field: 'aboutMe', options: aboutMeOptions, gradient: ["#F5F5F5", "#F5F5F5"] },
+          { field: 'myFaith', options: myFaithOptions, gradient: ["#F5F5F5", "#F5F5F5"] },
+          { field: 'personality', options: personalityOptions, gradient: ["#F5F5F5", "#F5F5F5"] },
+          { field: 'languages', options: languagesOptions, gradient: ["#F5F5F5", "#F5F5F5"] },
+          { field: 'ethnicity', options: ethnicityOptions, gradient: ["#F5F5F5", "#F5F5F5"] },
         ].map(({ field, options, gradient }) => (
           <Animated.View entering={FadeInUp.duration(500)} key={field} style={styles.section}>
             <LinearGradient colors={gradient} style={styles.sectionContainer}>
@@ -1130,7 +1130,7 @@ const handleGalleryUpload = async () => {
           </Animated.View>
         ))}
         <Animated.View entering={FadeInUp.duration(500)} style={styles.section}>
-          <LinearGradient colors={['#CF435AFF', '#DE7B7BFF']} style={styles.sectionContainer}>
+          <LinearGradient colors={['#F5F5F5', '#DE7B7BFF']} style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>Gallery</Text>
             <TouchableOpacity style={styles.button} onPress={handleGalleryUpload}>
               <Text style={styles.buttonText}>Upload Gallery Images</Text>
@@ -1286,13 +1286,13 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   sectionTitle: {
-    color: '#FFFFFF',
+    color: '#1D1919FF',
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 15,
     textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 1, height: 1 },
+    // textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    // textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
   optionsContainer: {

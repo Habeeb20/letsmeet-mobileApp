@@ -1553,8 +1553,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
     borderRadius: 15,
     padding: 15,
-    marginTop: 20,
-    marginBottom: 100,
+    marginTop: 5,
+    marginBottom: 2,
   },
   sectionTitle: {
     fontSize: 20,
@@ -1649,7 +1649,7 @@ const styles = StyleSheet.create({
 //   shadowOffset: { width: 0, height: 2 },
 //   shadowOpacity: 0.2,
 //   shadowRadius: 4,
-//   elevation: 3,
+//   elevation: 3, 
 // },
 
 galleryContainer: {

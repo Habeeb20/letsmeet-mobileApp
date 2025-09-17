@@ -192,4 +192,20 @@ export const visitors = async(token) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
+
+
+
+// Add user to favorites
+export const addFavorite = async (userId, token) => {
+  return api.post('/api/dating/favorite', { userId }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Get favorited users
+export const getFavorites = async (token) => {
+  return api.get('/api/dating/favorites', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
 export default api;

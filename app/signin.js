@@ -83,7 +83,7 @@ const Signin = () => {
         )}
       </TouchableOpacity>
     
-<Link href="/signup" asChild>
+<Link href="/onboarding1" asChild>
   <Text style={styles.signupButton} className="signup-link">
     New to Let's Meet? Sign up
   </Text>
