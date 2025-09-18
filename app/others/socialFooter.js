@@ -80,7 +80,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../colors";
 import { useRouter } from "expo-router";
 
-const Footer = () => {
+const SocialFooter = () => {
   const router = useRouter(); // Initialize router
 
   const navigateToScreen = (screen) => {
@@ -94,35 +94,35 @@ const Footer = () => {
           style={styles.navItem}
           onPress={() => navigateToScreen("dashboard")}
         >
-          <Icon name="compass" size={24} color={colors.primary} />
+          <Icon name="compass" size={24} color={colors.heartblue} />
           <Text style={styles.navText}>Discover</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigateToScreen("matches")}
         >
-          <Icon name="heart" size={24} color={colors.primary} />
+          <Icon name="heart" size={24} color={colors.heartblue} />
           <Text style={styles.navText}>Matches</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigateToScreen("messages")}
         >
-          <Icon name="comment" size={24} color={colors.primary} />
+          <Icon name="comment" size={24} color={colors.heartblue} />
           <Text style={styles.navText}>Messages</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => navigateToScreen("feedScreen")}
+          onPress={() => navigateToScreen("social")}
         >
-          <Icon name="users" size={24} color={colors.primary} />
+          <Icon name="users" size={24} color={colors.heartblue} />
           <Text style={styles.navText}>Social</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigateToScreen("mydata")}
         >
-          <Icon name="user" size={24} color={colors.primary} />
+          <Icon name="user" size={24} color={colors.heartblue} />
           <Text style={styles.navText}>Profile</Text>
         </TouchableOpacity>
       </View>
@@ -151,10 +151,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   navText: {
-    color: colors.textPrimary,
+    color: "#000000",
     fontSize: 12,
     marginTop: 5,
   },
 });
 
-export default Footer;
+export default  SocialFooter ;

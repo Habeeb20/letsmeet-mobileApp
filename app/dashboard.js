@@ -1515,9 +1515,9 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 16,
-    backgroundColor: '#191717FF',
+    backgroundColor: '#C8BABAFF',
     padding: 5,
-    color: '#fff',
+    color: '#000000',
     marginVertical: 5,
     textShadowRadius: 2,
     borderRadius:15

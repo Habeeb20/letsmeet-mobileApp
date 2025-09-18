@@ -1,11 +1,16 @@
 import axios from 'axios';
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const getToken = async () => {
+  return await AsyncStorage.getItem('authToken');
+};
 
 
-// const API_URL = "https://dating-mobileapp-backend1.onrender.com"
+const API_URL = "https://dating-mobileapp-backend1.onrender.com"
 
 // const API_URL = "http://localhost:5000";
-const API_URL = 'http://172.20.10.6:5000';
+// const API_URL = "http://192.168.1.111:5000";
+// const API_URL = 'http://172.20.10.6:5000';
 console.log('api.js: API_URL:', API_URL);
 
 const api = axios.create({
@@ -208,4 +213,118 @@ export const getFavorites = async (token) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+
+
+
+
+// Post APIs
+export const createPost = async (postData) => {
+  const token = await getToken();
+  return api.post('/api/posts/', postData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const editPost = async (postId, postData) => {
+  const token = await getToken();
+  return api.put(`/api/posts/${postId}`, postData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const deletePost = async (postId) => {
+  const token = await getToken();
+  return api.delete(`/api/posts/${postId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const likePost = async (postId) => {
+  const token = await getToken();
+  return api.post(`/api/posts/${postId}/like`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const commentOnPost = async (postId, content) => {
+  const token = await getToken();
+  return api.post(`/api/posts/${postId}/comment`, { content }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const sharePost = async (postId) => {
+  const token = await getToken();
+  return api.post(`/api/posts/${postId}/share`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const savePost = async (postId) => {
+  const token = await getToken();
+  return api.post(`/api/posts/${postId}/save`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const trackPostView = async (postId) => {
+  const token = await getToken();
+  return api.post(`/api/posts/${postId}/view`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const getFeed = async () => {
+  const token = await getToken();
+  return api.get('/api/posts/feed', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const getPost = async (postId) => {
+  const token = await getToken();
+  return api.get(`/api/posts/${postId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Follow APIs
+export const followUser = async (userId) => {
+  const token = await getToken();
+  return api.post(`/api/posts/follow/${userId}`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const unfollowUser = async (userId) => {
+  const token = await getToken();
+  return api.delete(`/api/posts/follow/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// User APIs (assuming backend routes exist or add them: GET /api/users/:id, GET /api/users/:id/followers)
+export const getUser = async (userId) => {
+  const token = await getToken();
+  return api.get(`/api/auth/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const getFollowers = async (userId) => {
+  const token = await getToken();
+  return api.get(`/api/auth/${userId}/followers`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+
+
+
+
+
+
+
+
 export default api;

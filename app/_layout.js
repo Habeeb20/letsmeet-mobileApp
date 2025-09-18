@@ -68,6 +68,8 @@ export default function Layout() {
       <Stack.Screen name="favorite" options={{ headerShown: false }} />
       
       <Stack.Screen name="visitorScreen" options={{ headerShown: false }} />
+        <Stack.Screen name="feedScreen" options={{ headerShown: false }} /> {/* FeedScreen */}
+        <Stack.Screen name="createPostScreen" options={{ headerShown: false }} /> {/* CreatePostScreen */}
 
 
     </Stack>
