@@ -1,98 +1,124 @@
-
-
 import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
-  Alert,
   ActivityIndicator,
   Platform,
 } from "react-native";
-import colors from "./../colors"
-
-
-import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
+import { useRouter, Link } from "expo-router";
 import { submitLogin } from "../constants/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { withKeyboardAvoiding } from "./utils/keyboardAvoiding";
-
-import { Link } from "expo-router";
 
 const Signin = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleSignup = () => {
-    router.push('/signup')
-  }
+  const [error, setError] = useState(null);
 
   const handleNext = async () => {
     if (!email.trim()) {
-      Alert.alert("Error", "Please enter your email");
+      setError("Please enter your email");
       return;
     }
+
+    setError(null);
     setIsLoading(true);
     try {
       const response = await submitLogin({ email });
-      await AsyncStorage.setItem('userEmail', email);
-      console.log(response, "login response");
+      await AsyncStorage.setItem("userEmail", email);
       router.push({ pathname: "/loginToken", params: { email } });
-    } catch (error) {
-      console.error("Login error:", error);
-      Alert.alert(
-        "Error",
-        error.response?.data?.message || "Failed to send verification code"
-      );
+    } catch (err) {
+      console.error("Login error:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Failed to send verification code");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Wrap the entire UI in withKeyboardAvoiding
   return withKeyboardAvoiding(
     <View style={styles.container}>
-      <Image
-        source={require("../assets/images/datingLogo.jpeg")}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>Enter your email</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        placeholderTextColor={colors.textSecondary}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleNext}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <ActivityIndicator size="small" color={colors.buttonText} />
-        ) : (
-          <Text style={styles.buttonText}>Next</Text>
+      <View style={styles.topAccent} />
+
+      <View style={styles.content}>
+        <View style={styles.animationWrapper}>
+          <LottieView
+            source={require("../assets/images/Social media react animation.json")}
+            autoPlay
+            loop
+            style={styles.animation}
+          />
+        </View>
+
+        <Text style={styles.title}>Welcome back</Text>
+        <Text style={styles.subtitle}>Enter your email to continue</Text>
+
+        <View style={styles.inputWrapper}>
+          <Ionicons name="mail-outline" size={20} color="#C7807F" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={(text) => {
+              setError(null);
+              setEmail(text);
+            }}
+            placeholder="Email"
+            placeholderTextColor="#B5A3A3"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            editable={!isLoading}
+          />
+        </View>
+
+        {error && (
+          <View style={styles.errorRow}>
+            <Ionicons name="alert-circle" size={14} color="#E8877A" />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
         )}
-      </TouchableOpacity>
-    
-<Link href="/onboarding1" asChild>
-  <Text style={styles.signupButton} className="signup-link">
-    New to Let's Meet? Sign up
-  </Text>
-</Link>
+
+        <TouchableOpacity
+          onPress={handleNext}
+          disabled={isLoading}
+          activeOpacity={0.85}
+          style={styles.buttonShadow}
+        >
+          <LinearGradient
+            colors={isLoading ? ["#D9B8B8", "#D9B8B8"] : ["#FF6B6B", "#FF3D77"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.button}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonText}>Next</Text>
+                <Ionicons name="arrow-forward" size={18} color="#fff" />
+              </View>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <Link href="/onboarding1" asChild>
+          <TouchableOpacity style={styles.signupRow} activeOpacity={0.7}>
+            <Text style={styles.signupText}>
+              New to Let's Meet? <Text style={styles.signupAccent}>Sign up</Text>
+            </Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
     </View>,
     {
       behavior: Platform.OS === "ios" ? "padding" : "height",
-      keyboardVerticalOffset: Platform.OS === "ios" ? 120 : 100, // Adjust as needed
-      style: { flex: 1, backgroundColor: colors.background }, // Match container styles
+      keyboardVerticalOffset: Platform.OS === "ios" ? 120 : 100,
+      style: { flex: 1, backgroundColor: "#FFF8F5" },
     }
   );
 };
@@ -100,57 +126,115 @@ const Signin = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    padding: 30,
-    justifyContent: "center",
+    backgroundColor: "#FFF8F5",
   },
-  logo: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 40,
-    alignSelf: "center",
+  topAccent: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 260,
+    backgroundColor: "#FFE4E1",
+    borderBottomLeftRadius: 60,
+    borderBottomRightRadius: 60,
+  },
+  content: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 28,
+  },
+  animationWrapper: {
+    marginBottom: 4,
+  },
+  animation: {
+    width: 160,
+    height: 160,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
-    color: colors.textPrimary,
+    color: "#3D2C2E",
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#8A7373",
+    textAlign: "center",
+    marginBottom: 28,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    height: 54,
+    borderWidth: 1,
+    borderColor: "#F3E4E2",
+    shadowColor: "#3D2C2E",
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  inputIcon: {
+    marginRight: 10,
   },
   input: {
-    width: "85%",
-    height: 50,
-    backgroundColor: colors.secondary,
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    color: colors.textPrimary,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: colors.textSecondary,
+    flex: 1,
+    fontSize: 15,
+    color: "#3D2C2E",
+  },
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 14,
+    alignSelf: "flex-start",
+  },
+  errorText: {
+    fontSize: 12.5,
+    color: "#E8877A",
+    fontWeight: "600",
+  },
+  buttonShadow: {
+    width: "100%",
+    marginTop: 24,
+    borderRadius: 999,
+    shadowColor: "#FF3D77",
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
   },
   button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 15,
-    paddingHorizontal: 50,
-    borderRadius: 30,
-    width: "85%",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    borderRadius: 999,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   buttonText: {
-    color: colors.buttonText,
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center",
   },
-  signupButton:{
-    marginTop:25
+  signupRow: {
+    marginTop: 22,
+  },
+  signupText: {
+    fontSize: 14,
+    color: "#8A7373",
+  },
+  signupAccent: {
+    color: "#FF3D77",
+    fontWeight: "700",
   },
 });
 

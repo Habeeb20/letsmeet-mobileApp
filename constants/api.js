@@ -6,10 +6,11 @@ const getToken = async () => {
 };
 
 
-const API_URL = "https://dating-mobileapp-backend1.onrender.com"
+// const API_URL = "https://dating-mobileapp-backend1.onrender.com"
+
 
 // const API_URL = "http://localhost:5000";
-// const API_URL = "http://192.168.1.111:5000";
+const API_URL = "http://192.168.100.13:6000";
 // const API_URL = 'http://172.20.10.6:5000';
 console.log('api.js: API_URL:', API_URL);
 

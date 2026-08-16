@@ -1,12 +1,12 @@
 const colors = {
-  primary: '#FF0050',
+  primary: '#FF6B6B',
   secondary: '#F5F5F5',
   textPrimary: '#333333',
   textSecondary: '#666666',
   background: '#FFFFFF',
   accent: '#FFA500',
   buttonText: '#FFFFFF',
-  heart: '#ff4d4d',
+  heart: '#FF3D77',
   heartblue: '#4DA0FFFF',
 };
 

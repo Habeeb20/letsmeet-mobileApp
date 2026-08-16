@@ -1,130 +1,129 @@
-// import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-// import Icon from "react-native-vector-icons/FontAwesome";
-// import colors from "../../colors";
+// import React from "react";
+// import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
+// import { useRouter, usePathname } from "expo-router";
+// import { Ionicons } from "@expo/vector-icons";
+// import { LinearGradient } from "expo-linear-gradient";
 
-// import { useRouter } from "expo-router"; // Removed unused ScrollView import
+// const NAV_ITEMS = [
+//   { key: "dashboard", icon: "compass", label: "Discover", route: "/dashboard" },
+//   { key: "matches", icon: "heart", label: "Matches", route: "/matches" },
+//   { key: "messages", icon: "chatbubble-ellipses", label: "Messages", route: "/messages" },
+//   { key: "feedScreen", icon: "people", label: "Social", route: "/feedScreen" },
+//   { key: "mydata", icon: "person", label: "Profile", route: "/mydata" },
+// ];
 
-// const Footer = () => {
-//   const router = useRouter(); // Initialize router
-
-//   const navigateToScreen = (screen) => {
-//     router.push(`/${screen}`); // Ensure screen names match routes in app/ directory
-//   };
+// const Footer = ({ active }) => {
+//   const router = useRouter();
+//   const pathname = usePathname();
 
 //   return (
-//     <View>
-//       <View style={styles.bottomNav}>
-//         <TouchableOpacity
-//           style={styles.navItem}
-//           onPress={() => navigateToScreen("dashboard")}
-//         >
-//           <Icon name="compass" size={24} color={colors.primary} />
-//           <Text style={styles.navText}>Discover</Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity
-//           style={styles.navItem}
-//           onPress={() => navigateToScreen("matches")}
-//         >
-//           <Icon name="heart" size={24} color={colors.primary} />
-//           <Text style={styles.navText}>Matches</Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity
-//           style={styles.navItem}
-//           onPress={() => navigateToScreen("messages")}
-//         >
-//           <Icon name="comment" size={24} color={colors.primary} />
-//           <Text style={styles.navText}>Messages</Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity
-//           style={styles.navItem}
-//           onPress={() => navigateToScreen("social")}
-//         >
-//           <Icon name="users" size={24} color={colors.primary} />
-//           <Text style={styles.navText}>Social</Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity
-//           style={styles.navItem}
-//           onPress={() => navigateToScreen("mydata")}
-//         >
-//           <Icon name="user" size={24} color={colors.primary} />
-//           <Text style={styles.navText}>Profile</Text>
-//         </TouchableOpacity>
-//       </View>
+//     <View style={styles.bottomBar}>
+//       {NAV_ITEMS.map((item) => {
+//         const isActive = active ? item.key === active : pathname?.includes(item.route);
+//         return (
+//           <TouchableOpacity
+//             key={item.key}
+//             style={styles.navItem}
+//             onPress={() => router.push(item.route)}
+//             activeOpacity={0.7}
+//           >
+//             {isActive ? (
+//               <LinearGradient colors={["#FF6B6B", "#FF3D77"]} style={styles.navIconActive}>
+//                 <Ionicons name={item.icon} size={19} color="#fff" />
+//               </LinearGradient>
+//             ) : (
+//               <Ionicons name={`${item.icon}-outline`} size={22} color="#B5A3A3" />
+//             )}
+//             <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
+//               {item.label}
+//             </Text>
+//           </TouchableOpacity>
+//         );
+//       })}
 //     </View>
 //   );
 // };
 
 // const styles = StyleSheet.create({
-//   bottomNav: {
+//   bottomBar: {
 //     flexDirection: "row",
-//     justifyContent: "space-around",
-//     backgroundColor: colors.secondary,
-//     paddingVertical: 10,
-//     marginVertical: 15,
+//     backgroundColor: "#fff",
 //     borderTopWidth: 1,
-//     borderTopColor: colors.background,
+//     borderTopColor: "#F3E4E2",
+//     paddingTop: 10,
+//     paddingBottom: Platform.select({ ios: 26, android: 14, default: 14 }),
+//     paddingHorizontal: 8,
 //   },
 //   navItem: {
+//     flex: 1,
 //     alignItems: "center",
+//     gap: 3,
 //   },
-//   navText: {
-//     color: colors.textPrimary,
-//     fontSize: 12,
-//     marginTop: 5,
+//   navIconActive: {
+//     width: 34,
+//     height: 34,
+//     borderRadius: 17,
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   navLabel: {
+//     fontSize: 10.5,
+//     color: "#B5A3A3",
+//     fontWeight: "600",
+//   },
+//   navLabelActive: {
+//     color: "#FF3D77",
 //   },
 // });
 
-// export default Footer; // Capitalized component name for convention
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Platform, StatusBar } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
-import colors from "../../colors";
-import { useRouter } from "expo-router";
+// export default Footer;
 
-const Footer = () => {
-  const router = useRouter(); // Initialize router
 
-  const navigateToScreen = (screen) => {
-    router.push(`/${screen}`); // Ensure screen names match routes in app/ directory
-  };
+
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter, usePathname } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+
+const NAV_ITEMS = [
+  { key: "dashboard", icon: "compass", label: "Discover", route: "/dashboard" },
+  { key: "matches", icon: "heart", label: "Matches", route: "/matches" },
+  { key: "messages", icon: "chatbubble-ellipses", label: "Messages", route: "/messages" },
+  { key: "feedScreen", icon: "people", label: "Social", route: "/feedScreen" },
+  { key: "mydata", icon: "person", label: "Profile", route: "/mydata" },
+];
+
+const Footer = ({ active }) => {
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-      <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigateToScreen("dashboard")}
-        >
-          <Icon name="compass" size={24} color={colors.primary} />
-          <Text style={styles.navText}>Discover</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigateToScreen("matches")}
-        >
-          <Icon name="heart" size={24} color={colors.primary} />
-          <Text style={styles.navText}>Matches</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigateToScreen("messages")}
-        >
-          <Icon name="comment" size={24} color={colors.primary} />
-          <Text style={styles.navText}>Messages</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigateToScreen("feedScreen")}
-        >
-          <Icon name="users" size={24} color={colors.primary} />
-          <Text style={styles.navText}>Social</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigateToScreen("mydata")}
-        >
-          <Icon name="user" size={24} color={colors.primary} />
-          <Text style={styles.navText}>Profile</Text>
-        </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+      <View style={styles.bottomBar}>
+        {NAV_ITEMS.map((item) => {
+          const isActive = active ? item.key === active : pathname?.includes(item.route);
+          return (
+            <TouchableOpacity
+              key={item.key}
+              style={styles.navItem}
+              onPress={() => router.push(item.route)}
+              activeOpacity={0.7}
+            >
+              {isActive ? (
+                <LinearGradient colors={["#FF6B6B", "#FF3D77"]} style={styles.navIconActive}>
+                  <Ionicons name={item.icon} size={19} color="#fff" />
+                </LinearGradient>
+              ) : (
+                <Ionicons name={`${item.icon}-outline`} size={22} color="#B5A3A3" />
+              )}
+              <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </SafeAreaView>
   );
@@ -132,28 +131,40 @@ const Footer = () => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 0,
-    backgroundColor: colors.secondary,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#fff",
   },
-  bottomNav: {
+  bottomBar: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: colors.secondary,
-    paddingVertical: 10,
+    backgroundColor: "#fff",
     borderTopWidth: 1,
-    borderTopColor: colors.background,
-    elevation: 10, // Adds shadow on Android
-    zIndex: 1000, // Ensures it stays above content
-    // Dynamically adjust height for Android navigation bar
-    minHeight: Platform.OS === 'android' ? 60 + (StatusBar.currentHeight || 0) : 60,
+    borderTopColor: "#F3E4E2",
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 8,
   },
   navItem: {
+    flex: 1,
     alignItems: "center",
+    gap: 3,
   },
-  navText: {
-    color: colors.textPrimary,
-    fontSize: 12,
-    marginTop: 5,
+  navIconActive: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navLabel: {
+    fontSize: 10.5,
+    color: "#B5A3A3",
+    fontWeight: "600",
+  },
+  navLabelActive: {
+    color: "#FF3D77",
   },
 });
 

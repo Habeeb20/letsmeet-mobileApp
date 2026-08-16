@@ -49,7 +49,7 @@ const phone = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/images/datingLogo.jpeg")}
+        source={require("../assets/images/Social media react animation.json")}
         style={styles.logo}
         resizeMode="contain"
       />
