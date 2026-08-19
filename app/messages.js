@@ -1,452 +1,3 @@
-
-
-// import React, { useState, useEffect } from 'react';
-// import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, ScrollView, TextInput } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { useRouter } from 'expo-router';
-// import { getFriends, getChatHistory, sendMessage, getUserByEmail } from '../constants/api';
-// import Footer from './others/Footer';
-// import LoveLoader from './others/LoveLoader';
-// import CustomError from './others/customError';
-// import { Icon } from 'react-native-elements/dist/icons/Icon';
-// import im from '../assets/images/alady.jpg';
-
-// const Messages = () => {
-//   const router = useRouter();
-//   const [friends, setFriends] = useState([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [token, setToken] = useState(null);
-//   const [selectedFriend, setSelectedFriend] = useState(null);
-//   const [chatHistory, setChatHistory] = useState([]);
-//   const [message, setMessage] = useState('');
-//   const [chatLoading, setChatLoading] = useState(false);
-//   const [userId, setUserId] = useState(null);
-
-//   useEffect(() => {
-//     const fetchUserIdAndFriends = async () => {
-//       setIsLoading(true);
-//       setError(null);
-//       try {
-//         const storedToken = await AsyncStorage.getItem('authToken');
-//         if (!storedToken) {
-//           router.push('/signin');
-//           return;
-//         }
-//         setToken(storedToken);
-
-//         // Fetch user ID using email
-//         const storedEmail = await AsyncStorage.getItem('userEmail');
-//         if (!storedEmail) {
-//           router.push('/signin');
-//           return;
-//         }
-//         const userResponse = await getUserByEmail(storedEmail, storedToken);
-//         if (userResponse.data) {
-//           setUserId(userResponse.data.userId);
-//         } else {
-//           throw new Error(userResponse.message || 'Failed to fetch user ID');
-//         }
-
-//         // Fetch friends
-//         const friendsResponse = await getFriends(storedToken);
-//         setFriends(friendsResponse.data);
-//       } catch (err) {
-//         setError(err.response?.data?.message || err.message || 'Failed to fetch data');
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-//     fetchUserIdAndFriends();
-//   }, []);
-
-//   const fetchChatHistory = async (friendId) => {
-//     setChatLoading(true);
-//     setError(null);
-//     try {
-//       const response = await getChatHistory(friendId, token);
-//       setChatHistory(response.data);
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Failed to fetch chat history');
-//     } finally {
-//       setChatLoading(false);
-//     }
-//   };
-
-//   const handleSendMessage = async () => {
-//     if (!message.trim()) return;
-//     setChatLoading(true);
-//     try {
-//       const response = await sendMessage(selectedFriend._id, message, token);
-//       console.log('Send message response:', response.data);
-//       await fetchChatHistory(selectedFriend._id);
-//       setMessage('');
-//     } catch (err) {
-//       console.error('Send message error:', err);
-//       setError(err.response?.data?.message || 'Failed to send message');
-//     } finally {
-//       setChatLoading(false);
-//     }
-//   };
-
-//   const openChat = (friend) => {
-//     setSelectedFriend(friend);
-//     fetchChatHistory(friend._id);
-//   };
-
-//   const closeChat = () => {
-//     setSelectedFriend(null);
-//     setChatHistory([]);
-//     setMessage('');
-//   };
-
-//   if (isLoading) return <LoveLoader visible={true} />;
-//   if (error) return <CustomError message={error} onRetry={() => setIsLoading(true)} />;
-
-//   return (
-//     <View style={styles.container}>
-//       <View style={styles.topNav}>
-//         <TouchableOpacity
-//           style={styles.navItem}
-//           onPress={() => router.push('/newMessage')}
-//         >
-//           <Text style={styles.navText}>New</Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity
-//           style={styles.navItem}
-//           onPress={() => router.push('/archived')}
-//         >
-//           <Icon name="archive" size={20} color="#FFFFFF" />
-//         </TouchableOpacity>
-//         <TouchableOpacity
-//           style={styles.navItem}
-//           onPress={() => router.push('/settings')}
-//         >
-//           <Icon name="cog" size={20} color="#FFFFFF" />
-//         </TouchableOpacity>
-//       </View>
-//       <Text style={styles.title}>Messages</Text>
-//       {friends.length > 0 ? (
-//         <FlatList
-//           data={friends}
-//           keyExtractor={(item) => item._id}
-//           renderItem={({ item }) => {
-//             const lastMessage = item.lastMessages && item.lastMessages.length > 0 
-//               ? item.lastMessages[item.lastMessages.length - 1].content 
-//               : 'No messages yet';
-//             return (
-//               <TouchableOpacity
-//                 style={styles.chatItem}
-//                 onPress={() => openChat(item)}
-//               >
-//                 <Image
-//                   source={item.profilePicture ? { uri: item.profilePicture } : im}
-//                   style={styles.chatImage}
-//                   defaultSource={im}
-//                 />
-//                 <View style={styles.chatDetails}>
-//                   <Text style={styles.chatName}>{`${item.firstName} ${item.lastName}`}</Text>
-//                   <Text style={styles.chatPreview}>{lastMessage}</Text>
-//                 </View>
-//                 <View style={styles.timeBadgeContainer}>
-//                   <Text style={styles.timeText}>{item.lastMessageTime || '1 hour'}</Text>
-//                   {item.unreadCount > 0 && (
-//                     <View style={styles.unreadBadge}>
-//                       <Text style={styles.unreadText}>{item.unreadCount}</Text>
-//                     </View>
-//                   )}
-//                 </View>
-//               </TouchableOpacity>
-//             );
-//           }}
-//         />
-//       ) : (
-//         <Text style={styles.noFriendsText}>No friends to message</Text>
-//       )}
-//       {/* Chat Modal */}
-//       <Modal
-//         visible={!!selectedFriend}
-//         animationType="slide"
-//         onRequestClose={closeChat}
-//       >
-//         <View style={styles.chatModalContainer}>
-//           <View style={styles.header}>
-//             <Image
-//               source={selectedFriend?.profilePicture ? { uri: selectedFriend.profilePicture } : im}
-//               style={styles.headerImage}
-//               defaultSource={im}
-//             />
-//             <Text style={styles.headerName}>{`${selectedFriend?.firstName} ${selectedFriend?.lastName}`}</Text>
-//             <Text style={styles.headerStatus}>Online</Text>
-//             <TouchableOpacity style={styles.headerClose} onPress={closeChat}>
-//               <Icon name="close" size={24} color="#FF2E63" />
-//             </TouchableOpacity>
-//           </View>
-//           <ScrollView contentContainerStyle={styles.chatModalContent}>
-//             {chatLoading ? (
-//               <LoveLoader visible={true} />
-//             ) : error ? (
-//               <CustomError message={error} onRetry={() => fetchChatHistory(selectedFriend._id)} />
-//             ) : chatHistory.length > 0 ? (
-//               chatHistory.map((msg) => (
-//                 <View
-//                   key={msg._id}
-//                   style={[
-//                     styles.messageBubble,
-//                     msg.sender._id === userId ? styles.sentBubble : styles.receivedBubble,
-//                   ]}
-//                 >
-//                   <Text style={[
-//                     styles.messageText,
-//                     msg.sender._id === userId ? styles.sentMessageText : styles.receivedMessageText
-//                   ]}>
-//                     {msg.content}
-//                   </Text>
-//                   <Text style={styles.messageTime}>{new Date(msg.createdAt).toLocaleTimeString()}</Text>
-//                 </View>
-//               ))
-//             ) : (
-//               <Text style={styles.noMessagesText}>check your messages</Text>
-//             )}
-//           </ScrollView>
-//           <View style={styles.inputContainer}>
-//             <TextInput
-//               style={styles.messageInput}
-//               value={message}
-//               onChangeText={setMessage}
-//               placeholder="Type a message..."
-//               placeholderTextColor="#757575"
-//             />
-//             <TouchableOpacity
-//               style={styles.sendButton}
-//               onPress={handleSendMessage}
-//               disabled={chatLoading}
-//             >
-//               <Text style={styles.sendText}>Send</Text>
-//             </TouchableOpacity>
-//           </View>
-//         </View>
-//       </Modal>
-//       <Footer style={styles.localFooter} />
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#FFFFFF',
-//     padding: 0,
-//     marginTop: 0,
-//   },
-//   topNav: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-around',
-//     backgroundColor: '#FF2E63',
-//     paddingVertical: 10,
-//     borderBottomWidth: 0,
-//   },
-//   navItem: {
-//     alignItems: 'center',
-//   },
-//   navText: {
-//     color: '#FFFFFF',
-//     fontSize: 16,
-//     fontWeight: '500',
-//   },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: '700',
-//     color: '#333333',
-//     marginBottom: 15,
-//     textAlign: 'left',
-//     paddingHorizontal: 15,
-//   },
-//   chatItem: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#FAFAFA',
-//     borderRadius: 10,
-//     padding: 10,
-//     marginBottom: 10,
-//     marginHorizontal: 10,
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 4,
-//     elevation: 3,
-//   },
-//   chatImage: {
-//     width: 50,
-//     height: 50,
-//     borderRadius: 25,
-//     marginRight: 10,
-//   },
-//   chatDetails: {
-//     flex: 1,
-//   },
-//   chatName: {
-//     fontSize: 16,
-//     color: '#333333',
-//     fontWeight: '500',
-//   },
-//   chatPreview: {
-//     fontSize: 14,
-//     color: '#757575',
-//   },
-//   timeBadgeContainer: {
-//     flexDirection: 'column',
-//     alignItems: 'flex-end',
-//   },
-//   timeText: {
-//     fontSize: 12,
-//     color: '#757575',
-//     marginBottom: 2,
-//   },
-//   unreadBadge: {
-//     backgroundColor: '#FF2E63',
-//     borderRadius: 10,
-//     paddingHorizontal: 6,
-//     paddingVertical: 2,
-//   },
-//   unreadText: {
-//     color: '#FFFFFF',
-//     fontSize: 12,
-//     fontWeight: '600',
-//   },
-//   noFriendsText: {
-//     fontSize: 16,
-//     color: '#757575',
-//     textAlign: 'center',
-//     marginTop: 20,
-//   },
-//   localFooter: {
-//     position: 'absolute',
-//     bottom: 0,
-//     width: '100%',
-//     backgroundColor: '#E0E0E0',
-//     paddingVertical: 10,
-//     paddingHorizontal: 20,
-//     borderTopLeftRadius: 20,
-//     borderTopRightRadius: 20,
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: -2 },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 4,
-//     elevation: 4,
-//   },
-//   chatModalContainer: {
-//     flex: 1,
-//     backgroundColor: '#E7D7D0',
-//     padding: 0,
-//   },
-//   header: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#FFFFFF',
-//     padding: 10,
-//     borderBottomWidth: 1,
-//     borderBottomColor: '#E0E0E0',
-//   },
-//   headerImage: {
-//     width: 40,
-//     height: 40,
-//     borderRadius: 20,
-//     marginRight: 10,
-//   },
-//   headerName: {
-//     fontSize: 18,
-//     color: '#333333',
-//     fontWeight: '600',
-//   },
-//   headerStatus: {
-//     fontSize: 12,
-//     color: '#4CAF50',
-//     marginLeft: 5,
-//   },
-//   headerClose: {
-//     marginLeft: 'auto',
-//   },
-//   chatModalContent: {
-//     flexGrow: 1,
-//     paddingBottom: 70,
-//     padding: 10,
-//   },
-//   messageBubble: {
-//     maxWidth: '70%',
-//     padding: 10,
-//     borderRadius: 10,
-//     marginVertical: 5,
-//   },
-//   sentBubble: {
-//     backgroundColor: '#FFD1DC',
-//     alignSelf: 'flex-end',
-//   },
-//   receivedBubble: {
-//     backgroundColor: '#FFFFFF',
-//     alignSelf: 'flex-start',
-//   },
-//   messageText: {
-//     fontSize: 14,
-//     color: '#333333',
-//   },
-//   sentMessageText: {
-//     color: '#333333',
-//   },
-//   receivedMessageText: {
-//     color: '#333333',
-//   },
-//   messageTime: {
-//     fontSize: 10,
-//     color: '#757575',
-//     textAlign: 'right',
-//     marginTop: 2,
-//   },
-//   noMessagesText: {
-//     fontSize: 16,
-//     color: '#757575',
-//     textAlign: 'center',
-//     marginTop: 20,
-//   },
-//   inputContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     position: 'absolute',
-//     bottom: 0,
-//     width: '100%',
-//     backgroundColor: '#FFFFFF',
-//     padding: 10,
-//     borderTopWidth: 1,
-//     borderTopColor: '#E0E0E0',
-//   },
-//   messageInput: {
-//     flex: 1,
-//     backgroundColor: '#F5F5F5',
-//     borderRadius: 20,
-//     padding: 10,
-//     marginRight: 10,
-//     color: '#333333',
-//   },
-//   sendButton: {
-//     backgroundColor: '#FF2E63',
-//     padding: 10,
-//     borderRadius: 20,
-//   },
-//   sendText: {
-//     color: '#FFFFFF',
-//     fontSize: 14,
-//     fontWeight: '500',
-//   },
-// });
-
-// export default Messages;
-
-
-
-
-
-
-
 // app/messages.jsx
 import React, { useState, useEffect } from 'react';
 import {
@@ -471,6 +22,7 @@ import Footer from './others/Footer';
 import LoveLoader from './others/LoveLoader';
 import CustomError from './others/customError';
 import im from '../assets/images/alady.jpg';
+import KeyboardSafeScreen from './others/KeyboardAvoidingView';
 
 const timeAgo = (dateStr) => {
   if (!dateStr) return '';
@@ -492,6 +44,7 @@ const Messages = () => {
   const [message, setMessage] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [newChatModalVisible, setNewChatModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchUserIdAndFriends = async () => {
@@ -534,6 +87,11 @@ const Messages = () => {
     try {
       const response = await getChatHistory(friendId, token);
       setChatHistory(response.data);
+
+      // Clear the unread count locally once the chat has been opened/read
+      setFriends((prev) =>
+        prev.map((f) => (f._id === friendId ? { ...f, unreadCount: 0 } : f))
+      );
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch chat history');
     } finally {
@@ -548,6 +106,23 @@ const Messages = () => {
       await sendMessage(selectedFriend._id, message, token);
       await fetchChatHistory(selectedFriend._id);
       setMessage('');
+
+      // Optimistically bump this friend's lastMessages/lastMessageTime so the
+      // list preview updates immediately without waiting for a refetch.
+      setFriends((prev) =>
+        prev.map((f) =>
+          f._id === selectedFriend._id
+            ? {
+                ...f,
+                lastMessages: [
+                  ...(f.lastMessages || []),
+                  { content: message, sender: { _id: userId }, createdAt: new Date().toISOString() },
+                ],
+                lastMessageTime: new Date().toISOString(),
+              }
+            : f
+        )
+      );
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send message');
     } finally {
@@ -556,6 +131,7 @@ const Messages = () => {
   };
 
   const openChat = (friend) => {
+    setNewChatModalVisible(false);
     setSelectedFriend(friend);
     fetchChatHistory(friend._id);
   };
@@ -566,187 +142,258 @@ const Messages = () => {
     setMessage('');
   };
 
+  // Friends sorted by most recent activity — used both for the list and for
+  // suggesting who to start a new conversation with.
+  const sortedFriends = [...friends].sort((a, b) => {
+    const aTime = a.lastMessageTime ? new Date(a.lastMessageTime).getTime() : 0;
+    const bTime = b.lastMessageTime ? new Date(b.lastMessageTime).getTime() : 0;
+    return bTime - aTime;
+  });
+
+  // Recent matches with no conversation started yet — shown in the "new chat" modal
+  const friendsWithoutChat = sortedFriends.filter(
+    (f) => !f.lastMessages || f.lastMessages.length === 0
+  );
+  const newChatSuggestions = (friendsWithoutChat.length > 0 ? friendsWithoutChat : sortedFriends).slice(0, 2);
+
   if (isLoading) return <LoveLoader visible={true} />;
   if (error && !selectedFriend) return <CustomError message={error} onRetry={() => setIsLoading(true)} />;
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.topBar}>
-        <View>
-          <Text style={styles.title}>Messages</Text>
-          <Text style={styles.subtitle}>
-            {friends.length ? `${friends.length} conversations` : 'Start a conversation'}
-          </Text>
-        </View>
-        <View style={styles.topBarActions}>
-          <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/archived')}>
-            <Ionicons name="archive-outline" size={19} color="#3D2C2E" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/settings')}>
-            <Ionicons name="settings-outline" size={19} color="#3D2C2E" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push('/newMessage')}>
-            <LinearGradient colors={['#FF6B6B', '#FF3D77']} style={styles.newBtn}>
-              <Ionicons name="add" size={20} color="#fff" />
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Conversation list */}
-      {friends.length > 0 ? (
-        <FlatList
-          data={friends}
-          keyExtractor={(item) => item._id}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
-            const lastMessage =
-              item.lastMessages?.length > 0
-                ? item.lastMessages[item.lastMessages.length - 1].content
-                : 'Say hello 👋';
-            const unread = item.unreadCount > 0;
-            return (
-              <TouchableOpacity
-                style={styles.chatItem}
-                activeOpacity={0.7}
-                onPress={() => openChat(item)}
-              >
-                <View style={styles.avatarWrap}>
-                  <Image
-                    source={item.profilePicture ? { uri: item.profilePicture } : im}
-                    style={styles.chatImage}
-                    defaultSource={im}
-                  />
-                  {item.online && <View style={styles.onlineDot} />}
-                </View>
-                <View style={styles.chatDetails}>
-                  <Text style={styles.chatName} numberOfLines={1}>
-                    {item.firstName} {item.lastName}
-                  </Text>
-                  <Text
-                    style={[styles.chatPreview, unread && styles.chatPreviewUnread]}
-                    numberOfLines={1}
-                  >
-                    {lastMessage}
-                  </Text>
-                </View>
-                <View style={styles.timeBadgeContainer}>
-                  <Text style={styles.timeText}>{timeAgo(item.lastMessageTime)}</Text>
-                  {unread && (
-                    <View style={styles.unreadBadge}>
-                      <Text style={styles.unreadText}>{item.unreadCount}</Text>
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      ) : (
-        <View style={styles.emptyState}>
-          <Ionicons name="chatbubble-ellipses-outline" size={48} color="#FF3D77" />
-          <Text style={styles.emptyTitle}>No conversations yet</Text>
-          <Text style={styles.emptySubtitle}>Match with someone to start chatting</Text>
-        </View>
-      )}
-
-      {/* Chat modal */}
-      <Modal visible={!!selectedFriend} animationType="slide" onRequestClose={closeChat}>
-        <KeyboardAvoidingView
-          style={styles.chatModalContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-        >
-          <View style={styles.chatHeader}>
-            <TouchableOpacity style={styles.chatBackBtn} onPress={closeChat}>
-              <Ionicons name="arrow-back" size={20} color="#3D2C2E" />
-            </TouchableOpacity>
-            <Image
-              source={selectedFriend?.profilePicture ? { uri: selectedFriend.profilePicture } : im}
-              style={styles.headerImage}
-              defaultSource={im}
-            />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.headerName} numberOfLines={1}>
-                {selectedFriend?.firstName} {selectedFriend?.lastName}
-              </Text>
-              <View style={styles.statusRow}>
-                <View style={styles.statusDot} />
-                <Text style={styles.headerStatus}>Online</Text>
-              </View>
-            </View>
+    <KeyboardSafeScreen style={{ padding: 20 }}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.topBar}>
+          <View>
+            <Text style={styles.title}>Messages</Text>
+            <Text style={styles.subtitle}>
+              {friends.length ? `${friends.length} conversations` : 'Start a conversation'}
+            </Text>
           </View>
-
-          <ScrollView contentContainerStyle={styles.chatModalContent}>
-            {chatLoading && chatHistory.length === 0 ? (
-              <LoveLoader visible={true} />
-            ) : error ? (
-              <CustomError message={error} onRetry={() => fetchChatHistory(selectedFriend._id)} />
-            ) : chatHistory.length > 0 ? (
-              chatHistory.map((msg) => {
-                const isMine = msg.sender._id === userId;
-                return (
-                  <View
-                    key={msg._id}
-                    style={[styles.bubbleRow, isMine ? styles.bubbleRowSent : styles.bubbleRowReceived]}
-                  >
-                    {isMine ? (
-                      <LinearGradient
-                        colors={['#FF6B6B', '#FF3D77']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={[styles.messageBubble, styles.sentBubble]}
-                      >
-                        <Text style={styles.sentMessageText}>{msg.content}</Text>
-                        <Text style={styles.sentMessageTime}>
-                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </Text>
-                      </LinearGradient>
-                    ) : (
-                      <View style={[styles.messageBubble, styles.receivedBubble]}>
-                        <Text style={styles.receivedMessageText}>{msg.content}</Text>
-                        <Text style={styles.receivedMessageTime}>
-                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                );
-              })
-            ) : (
-              <View style={styles.emptyChatState}>
-                <Ionicons name="chatbubble-outline" size={36} color="#F3B8C4" />
-                <Text style={styles.noMessagesText}>No messages yet — say hi!</Text>
-              </View>
-            )}
-          </ScrollView>
-
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.messageInput}
-              value={message}
-              onChangeText={setMessage}
-              placeholder="Type a message..."
-              placeholderTextColor="#B5A3A3"
-              multiline
-            />
-            <TouchableOpacity
-              onPress={handleSendMessage}
-              disabled={chatLoading || !message.trim()}
-              style={{ opacity: chatLoading || !message.trim() ? 0.5 : 1 }}
-            >
-              <LinearGradient colors={['#FF6B6B', '#FF3D77']} style={styles.sendButton}>
-                <Ionicons name="send" size={17} color="#fff" />
+          <View style={styles.topBarActions}>
+            <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/archived')}>
+              <Ionicons name="archive-outline" size={19} color="#3D2C2E" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconBtn} onPress={() => router.push('/settings')}>
+              <Ionicons name="settings-outline" size={19} color="#3D2C2E" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setNewChatModalVisible(true)}>
+              <LinearGradient colors={['#FF6B6B', '#FF3D77']} style={styles.newBtn}>
+                <Ionicons name="add" size={20} color="#fff" />
               </LinearGradient>
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        </View>
 
-      <Footer active="chat" />
-    </View>
+        {/* Conversation list */}
+        {sortedFriends.length > 0 ? (
+          <FlatList
+            data={sortedFriends}
+            keyExtractor={(item) => item._id}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => {
+              const lastMsgObj =
+                item.lastMessages?.length > 0
+                  ? item.lastMessages[item.lastMessages.length - 1]
+                  : null;
+              const isMine = lastMsgObj?.sender?._id === userId || lastMsgObj?.sender === userId;
+              const lastMessage = lastMsgObj
+                ? `${isMine ? 'You: ' : ''}${lastMsgObj.content}`
+                : 'Say hello 👋';
+              const unreadCount = item.unreadCount || 0;
+              const unread = unreadCount > 0;
+              return (
+                <TouchableOpacity
+                  style={styles.chatItem}
+                  activeOpacity={0.7}
+                  onPress={() => openChat(item)}
+                >
+                  <View style={styles.avatarWrap}>
+                    <Image
+                      source={item.profilePicture ? { uri: item.profilePicture } : im}
+                      style={styles.chatImage}
+                      defaultSource={im}
+                    />
+                    {item.online && <View style={styles.onlineDot} />}
+                  </View>
+                  <View style={styles.chatDetails}>
+                    <Text style={styles.chatName} numberOfLines={1}>
+                      {item.firstName} {item.lastName}
+                    </Text>
+                    <Text
+                      style={[styles.chatPreview, unread && styles.chatPreviewUnread]}
+                      numberOfLines={1}
+                    >
+                      {lastMessage}
+                    </Text>
+                  </View>
+                  <View style={styles.timeBadgeContainer}>
+                    <Text style={styles.timeText}>{timeAgo(item.lastMessageTime)}</Text>
+                    {unread && (
+                      <View style={styles.unreadBadge}>
+                        <Text style={styles.unreadText}>{unreadCount > 99 ? '99+' : unreadCount}</Text>
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        ) : (
+          <View style={styles.emptyState}>
+            <Ionicons name="chatbubble-ellipses-outline" size={48} color="#FF3D77" />
+            <Text style={styles.emptyTitle}>No conversations yet</Text>
+            <Text style={styles.emptySubtitle}>Match with someone to start chatting</Text>
+          </View>
+        )}
+
+        {/* New chat modal — pick who to start a conversation with */}
+        <Modal
+          visible={newChatModalVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setNewChatModalVisible(false)}
+        >
+          <TouchableOpacity
+            style={styles.newChatOverlay}
+            activeOpacity={1}
+            onPress={() => setNewChatModalVisible(false)}
+          >
+            <TouchableOpacity activeOpacity={1} style={styles.newChatSheet}>
+              <View style={styles.newChatHandle} />
+              <Text style={styles.newChatTitle}>Start a new conversation</Text>
+              <Text style={styles.newChatSubtitle}>Who would you like to message?</Text>
+
+              {newChatSuggestions.length > 0 ? (
+                newChatSuggestions.map((friend) => (
+                  <TouchableOpacity
+                    key={friend._id}
+                    style={styles.newChatItem}
+                    activeOpacity={0.7}
+                    onPress={() => openChat(friend)}
+                  >
+                    <Image
+                      source={friend.profilePicture ? { uri: friend.profilePicture } : im}
+                      style={styles.newChatImage}
+                      defaultSource={im}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.newChatName}>
+                        {friend.firstName} {friend.lastName}
+                      </Text>
+                      <Text style={styles.newChatHint}>Tap to start chatting</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={18} color="#B5A3A3" />
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.newChatEmpty}>No matches available to message yet.</Text>
+              )}
+
+              <TouchableOpacity style={styles.newChatCancel} onPress={() => setNewChatModalVisible(false)}>
+                <Text style={styles.newChatCancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
+
+        {/* Chat modal */}
+        <Modal visible={!!selectedFriend} animationType="slide" onRequestClose={closeChat}>
+          <KeyboardAvoidingView
+            style={styles.chatModalContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+          >
+            <View style={styles.chatHeader}>
+              <TouchableOpacity style={styles.chatBackBtn} onPress={closeChat}>
+                <Ionicons name="arrow-back" size={20} color="#3D2C2E" />
+              </TouchableOpacity>
+              <Image
+                source={selectedFriend?.profilePicture ? { uri: selectedFriend.profilePicture } : im}
+                style={styles.headerImage}
+                defaultSource={im}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.headerName} numberOfLines={1}>
+                  {selectedFriend?.firstName} {selectedFriend?.lastName}
+                </Text>
+                <View style={styles.statusRow}>
+                  <View style={styles.statusDot} />
+                  <Text style={styles.headerStatus}>Online</Text>
+                </View>
+              </View>
+            </View>
+
+            <ScrollView contentContainerStyle={styles.chatModalContent}>
+              {chatLoading && chatHistory.length === 0 ? (
+                <LoveLoader visible={true} />
+              ) : error ? (
+                <CustomError message={error} onRetry={() => fetchChatHistory(selectedFriend._id)} />
+              ) : chatHistory.length > 0 ? (
+                chatHistory.map((msg) => {
+                  const isMine = msg.sender._id === userId;
+                  return (
+                    <View
+                      key={msg._id}
+                      style={[styles.bubbleRow, isMine ? styles.bubbleRowSent : styles.bubbleRowReceived]}
+                    >
+                      {isMine ? (
+                        <LinearGradient
+                          colors={['#FF6B6B', '#FF3D77']}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={[styles.messageBubble, styles.sentBubble]}
+                        >
+                          <Text style={styles.sentMessageText}>{msg.content}</Text>
+                          <Text style={styles.sentMessageTime}>
+                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </Text>
+                        </LinearGradient>
+                      ) : (
+                        <View style={[styles.messageBubble, styles.receivedBubble]}>
+                          <Text style={styles.receivedMessageText}>{msg.content}</Text>
+                          <Text style={styles.receivedMessageTime}>
+                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  );
+                })
+              ) : (
+                <View style={styles.emptyChatState}>
+                  <Ionicons name="chatbubble-outline" size={36} color="#F3B8C4" />
+                  <Text style={styles.noMessagesText}>No messages yet — say hi!</Text>
+                </View>
+              )}
+            </ScrollView>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.messageInput}
+                value={message}
+                onChangeText={setMessage}
+                placeholder="Type a message..."
+                placeholderTextColor="#B5A3A3"
+                multiline
+              />
+              <TouchableOpacity
+                onPress={handleSendMessage}
+                disabled={chatLoading || !message.trim()}
+                style={{ opacity: chatLoading || !message.trim() ? 0.5 : 1 }}
+              >
+                <LinearGradient colors={['#FF6B6B', '#FF3D77']} style={styles.sendButton}>
+                  <Ionicons name="send" size={17} color="#fff" />
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+
+        <Footer active="chat" />
+      </View>
+    </KeyboardSafeScreen>
   );
 };
 
@@ -885,6 +532,79 @@ const styles = StyleSheet.create({
     color: '#8A7373',
     marginTop: 4,
     textAlign: 'center',
+  },
+  newChatOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(61,44,46,0.4)',
+    justifyContent: 'flex-end',
+  },
+  newChatSheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 32,
+  },
+  newChatHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#F3E4E2',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  newChatTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#3D2C2E',
+    textAlign: 'center',
+  },
+  newChatSubtitle: {
+    fontSize: 13,
+    color: '#8A7373',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 20,
+  },
+  newChatItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    gap: 12,
+  },
+  newChatImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  newChatName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#3D2C2E',
+  },
+  newChatHint: {
+    fontSize: 12,
+    color: '#8A7373',
+    marginTop: 2,
+  },
+  newChatEmpty: {
+    textAlign: 'center',
+    color: '#8A7373',
+    fontSize: 13.5,
+    paddingVertical: 20,
+  },
+  newChatCancel: {
+    marginTop: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 20,
+    backgroundColor: '#FFF8F5',
+  },
+  newChatCancelText: {
+    color: '#3D2C2E',
+    fontWeight: '600',
+    fontSize: 14,
   },
   chatModalContainer: {
     flex: 1,

@@ -20,6 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useRouter } from "expo-router";
 import { submitEmail } from "../constants/api";
+import KeyboardSafeScreen from "./others/KeyboardAvoidingView";
 
 const EmailInput = () => {
   const router = useRouter();
@@ -88,7 +89,8 @@ const EmailInput = () => {
   }, [notification.visible]);
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardSafeScreen>
+ <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={styles.flex}
     >
@@ -185,6 +187,8 @@ const EmailInput = () => {
         )}
       </View>
     </KeyboardAvoidingView>
+    </KeyboardSafeScreen>
+   
   );
 };
 

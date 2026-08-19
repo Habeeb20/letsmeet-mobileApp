@@ -109,7 +109,7 @@ const TABS = [
   { key: 'dashboard', label: 'Discover', icon: 'explore' },
   { key: 'matches', label: 'Matches', icon: 'favorite' },
   { key: 'messages', label: 'Messages', icon: 'chat-bubble' },
-  { key: 'social', label: 'Social', icon: 'groups' },
+  // { key: 'social', label: 'Social', icon: 'groups' },
   { key: 'mydata', label: 'Profile', icon: 'person' },
 ];
 

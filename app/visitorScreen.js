@@ -1,23 +1,48 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   Image,
-  ScrollView,
   TouchableOpacity,
   StyleSheet,
   FlatList,
   Modal,
+  ScrollView,
+  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import api from '../constants/api';
-import colors from '../colors';
 import LoveLoader from './others/LoveLoader';
-import CustomError from './others/customError';
+import Footer from './others/Footer';
 import im from '../assets/images/alady.jpg';
+import SubNav from './others/SubNav';
+
+const { width } = Dimensions.get('window');
+const TAG_COLORS = ['#FFE4E1', '#FFF3D6', '#E1F0FF', '#E8F7EC', '#F3E1FF'];
+
+const TagRow = ({ title, items, emptyText }) => (
+  <View style={{ marginTop: 14 }}>
+    <Text style={styles.sectionTitle}>{title}</Text>
+    {items?.length > 0 ? (
+      <FlatList
+        data={items}
+        horizontal
+        keyExtractor={(item, i) => `${title}-${i}`}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item, index }) => (
+          <View style={[styles.tag, { backgroundColor: TAG_COLORS[index % TAG_COLORS.length] }]}>
+            <Text style={styles.tagText}>{item}</Text>
+          </View>
+        )}
+      />
+    ) : (
+      <Text style={styles.emptyText}>{emptyText}</Text>
+    )}
+  </View>
+);
 
 const VisitorsScreen = () => {
   const router = useRouter();
@@ -26,13 +51,6 @@ const VisitorsScreen = () => {
   const [error, setError] = useState(null);
   const [token, setToken] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
-
-  const pastelColors = [
-    '#FFF3CD', // Light yellow
-    '#D4EDDA', // Light green
-    '#F8D7DA', // Light pink
-    '#D1ECF1', // Light blue
-  ];
 
   useEffect(() => {
     const fetchVisitors = async () => {
@@ -48,11 +66,9 @@ const VisitorsScreen = () => {
         const visitorsResponse = await api.get('/api/dating/visitors', {
           headers: { Authorization: `Bearer ${storedToken}` },
         });
-        setVisitors(visitorsResponse.data); 
+        setVisitors(visitorsResponse.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch visitors');
-        console.error('Fetch visitors error:', err);
-     
       } finally {
         setIsLoading(false);
       }
@@ -66,9 +82,7 @@ const VisitorsScreen = () => {
         await api.post(
           '/api/users/visit',
           { profileId: userId },
-          {
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          }
+          { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } }
         );
       }
     } catch (err) {
@@ -78,336 +92,190 @@ const VisitorsScreen = () => {
 
   const viewUserDetails = (user) => {
     setSelectedUser(user);
-    logVisit(user._id); // Log visit when viewing user details
+    logVisit(user._id);
   };
 
-  const closeModal = () => {
-    setSelectedUser(null);
-  };
-
-  if (isLoading) return <LoveLoader visible={true} />;
-  if (error) return (
+  const Screen = ({ children }) => (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.error}>{error}</Text>
-        <TouchableOpacity style={styles.refreshButton} onPress={() => setIsLoading(true)}>
-          <Text style={styles.refreshButtonText}>Retry</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={styles.body}>{children}</View>
+      <Footer active="dashboard" />
     </View>
   );
 
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.sectionTitle}>Profile Visitors</Text>
-        {visitors.length > 0 ? (
-          <FlatList
-            data={visitors}
-            horizontal
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => viewUserDetails(item)}>
-                <Image
-                  source={item.profilePicture ? { uri: item.profilePicture } : im}
-                  style={styles.visitorImage}
-                  defaultSource={im}
-                />
-                <Text style={styles.visitorName}>{`${item.firstName} ${item.lastName}`}</Text>
-              </TouchableOpacity>
-            )}
-            showsHorizontalScrollIndicator={false}
-          />
-        ) : (
-          <View style={styles.noVisitorsContainer}>
-            <Icon name="heart" size={50} color={colors.primary} style={styles.heartIcon} />
-            <Text style={styles.noVisitorsText}>No Visitors Yet!</Text>
-            <Text style={styles.noVisitorsSubText}>
-              Keep exploring to attract more visitors to your profile!
-            </Text>
-          </View>
-        )}
-        <View style={styles.footerSpacer} />
-      </ScrollView>
+  if (isLoading) return <LoveLoader visible={true} />;
 
-      {/* User Details Modal */}
-      <Modal
-        visible={!!selectedUser}
-        animationType="slide"
-        onRequestClose={closeModal}
-      >
+  if (error) {
+    return (
+      <Screen>
+        <View style={styles.centerScreen}>
+          <Ionicons name="alert-circle-outline" size={40} color="#E8877A" />
+          <Text style={styles.error}>{error}</Text>
+          <TouchableOpacity onPress={() => setIsLoading(true)} style={styles.buttonShadow}>
+            <LinearGradient colors={['#FF6B6B', '#FF3D77']} style={styles.button}>
+              <Text style={styles.buttonText}>Retry</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen>
+     <View style={styles.topBar}>
+  <Text style={styles.title}>Profile Visitors</Text>
+  <Text style={styles.subtitle}>
+    {visitors.length ? `${visitors.length} people checked you out` : 'See who\u2019s been by'}
+  </Text>
+</View>
+<SubNav active="visited" />
+
+      {visitors.length > 0 ? (
+        <FlatList
+          data={visitors}
+          keyExtractor={(item) => item._id}
+          numColumns={2}
+          columnWrapperStyle={{ gap: 12 }}
+          contentContainerStyle={styles.grid}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.visitorCard} onPress={() => viewUserDetails(item)} activeOpacity={0.85}>
+              <Image
+                source={item.profilePicture ? { uri: item.profilePicture } : im}
+                style={styles.visitorImage}
+                defaultSource={im}
+              />
+              <Text style={styles.visitorName} numberOfLines={1}>
+                {item.firstName} {item.lastName}
+              </Text>
+              {!!item.age && <Text style={styles.visitorMeta}>{item.age} yrs</Text>}
+            </TouchableOpacity>
+          )}
+        />
+      ) : (
+        <View style={styles.centerScreen}>
+          <Ionicons name="eye-outline" size={48} color="#FF3D77" />
+          <Text style={styles.noUsersText}>No Visitors Yet</Text>
+          <Text style={styles.noUsersSubText}>Keep exploring to attract more visitors to your profile!</Text>
+        </View>
+      )}
+
+      <Modal visible={!!selectedUser} animationType="slide" onRequestClose={() => setSelectedUser(null)}>
         <View style={styles.modalContainer}>
-          <ScrollView>
+          <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
             {selectedUser && (
               <>
+                <TouchableOpacity onPress={() => setSelectedUser(null)} style={styles.modalBackButton}>
+                  <Ionicons name="arrow-back" size={22} color="#3D2C2E" />
+                </TouchableOpacity>
+
                 <Image
                   source={selectedUser.profilePicture ? { uri: selectedUser.profilePicture } : im}
                   style={styles.modalProfileImage}
                   defaultSource={im}
                 />
-                <Text style={styles.modalName}>{`${selectedUser.firstName} ${selectedUser.lastName}`}</Text>
-                <Text style={styles.modalDetail}>Age: {selectedUser.age || 'N/A'}</Text>
-                <Text style={styles.modalDetail}>Ethnicity: {selectedUser.ethnicity?.[0] || 'Not specified'}</Text>
-                <Text style={styles.modalDetail}>Faith: {selectedUser.myFaith?.[0] || 'Not specified'}</Text>
-                <Text style={styles.modalDetail}>State: {selectedUser.state || 'Not specified'}</Text>
-                <Text style={styles.modalDetail}>Bio: {selectedUser.bio || 'No bio available'}</Text>
-                <Text style={styles.modalDetail}>Education: {selectedUser.education || 'Not specified'}</Text>
-                <Text style={styles.sectionTitle}>About Me</Text>
-                {selectedUser.aboutMe?.length > 0 ? (
-                  <FlatList
-                    data={selectedUser.aboutMe}
-                    horizontal
-                    keyExtractor={(item, index) => `modal-about-${index}`}
-                    renderItem={({ item, index }) => (
-                      <View
-                        style={[
-                          styles.itemContainer,
-                          { backgroundColor: pastelColors[index % pastelColors.length] },
-                        ]}
-                      >
-                        <Text style={styles.itemText}>{item}</Text>
-                      </View>
-                    )}
-                    showsHorizontalScrollIndicator={false}
-                  />
-                ) : (
-                  <Text style={styles.modalDetail}>No info available</Text>
-                )}
-                <Text style={styles.sectionTitle}>Interests</Text>
-                {selectedUser.interests?.length > 0 ? (
-                  <FlatList
-                    data={selectedUser.interests}
-                    horizontal
-                    keyExtractor={(item, index) => `modal-interest-${index}`}
-                    renderItem={({ item, index }) => (
-                      <View
-                        style={[
-                          styles.itemContainer,
-                          { backgroundColor: pastelColors[index % pastelColors.length] },
-                        ]}
-                      >
-                        <Text style={styles.itemText}>{item}</Text>
-                      </View>
-                    )}
-                    showsHorizontalScrollIndicator={false}
-                  />
-                ) : (
-                  <Text style={styles.modalDetail}>No interests available</Text>
-                )}
-                <Text style={styles.sectionTitle}>Languages</Text>
-                {selectedUser.languages?.length > 0 ? (
-                  <FlatList
-                    data={selectedUser.languages}
-                    horizontal
-                    keyExtractor={(item, index) => `modal-language-${index}`}
-                    renderItem={({ item, index }) => (
-                      <View
-                        style={[
-                          styles.itemContainer,
-                          { backgroundColor: pastelColors[index % pastelColors.length] },
-                        ]}
-                      >
-                        <Text style={styles.itemText}>{item}</Text>
-                      </View>
-                    )}
-                    showsHorizontalScrollIndicator={false}
-                  />
-                ) : (
-                  <Text style={styles.modalDetail}>No languages available</Text>
-                )}
-                <Text style={styles.sectionTitle}>Personality</Text>
-                {selectedUser.personality?.length > 0 ? (
-                  <FlatList
-                    data={selectedUser.personality}
-                    horizontal
-                    keyExtractor={(item, index) => `modal-personality-${index}`}
-                    renderItem={({ item, index }) => (
-                      <View
-                        style={[
-                          styles.itemContainer,
-                          { backgroundColor: pastelColors[index % pastelColors.length] },
-                        ]}
-                      >
-                        <Text style={styles.itemText}>{item}</Text>
-                      </View>
-                    )}
-                    showsHorizontalScrollIndicator={false}
-                  />
-                ) : (
-                  <Text style={styles.modalDetail}>No personality info available</Text>
-                )}
-                <Text style={styles.sectionTitle}>Gallery</Text>
-                {selectedUser.gallery?.length > 0 ? (
-                  selectedUser.gallery.map((url, index) => (
-                    <Image
-                      key={index}
-                      source={{ uri: url }}
-                      style={styles.galleryImage}
-                      defaultSource={im}
-                    />
-                  ))
-                ) : (
-                  <Text style={styles.modalDetail}>No gallery images</Text>
-                )}
+                <Text style={styles.modalName}>{selectedUser.firstName} {selectedUser.lastName}</Text>
+                <Text style={styles.modalMeta}>
+                  {selectedUser.age ? `${selectedUser.age} \u00b7 ` : ''}
+                  {selectedUser.state || 'Location not specified'}
+                </Text>
+
+                <View style={styles.card}>
+                  <Text style={styles.sectionTitle}>Bio</Text>
+                  <Text style={styles.bodyText}>{selectedUser.bio || 'No bio available'}</Text>
+
+                  <Text style={[styles.sectionTitle, { marginTop: 14 }]}>Education</Text>
+                  <Text style={styles.bodyText}>{selectedUser.education || 'Not specified'}</Text>
+
+                  <TagRow title="About Me" items={selectedUser.aboutMe} emptyText="No info available" />
+                  <TagRow title="Interests" items={selectedUser.interests} emptyText="No interests available" />
+                  <TagRow title="Languages" items={selectedUser.languages} emptyText="No languages available" />
+                  <TagRow title="Personality" items={selectedUser.personality} emptyText="No personality info available" />
+
+                  <Text style={[styles.sectionTitle, { marginTop: 14 }]}>Gallery</Text>
+                  {selectedUser.gallery?.length > 0 ? (
+                    <View style={styles.galleryGrid}>
+                      {selectedUser.gallery.map((url, i) => (
+                        <Image key={i} source={{ uri: url }} style={styles.galleryImage} defaultSource={im} />
+                      ))}
+                    </View>
+                  ) : (
+                    <Text style={styles.emptyText}>No gallery images</Text>
+                  )}
+                </View>
+
                 <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={closeModal}
+                  onPress={() => setSelectedUser(null)}
+                  style={[styles.buttonShadow, { alignSelf: 'center', marginTop: 20 }]}
                 >
-                  <Text style={styles.closeButtonText}>Close</Text>
+                  <LinearGradient colors={['#FF6B6B', '#FF3D77']} style={styles.button}>
+                    <Text style={styles.buttonText}>Close</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </>
             )}
           </ScrollView>
         </View>
       </Modal>
-    </View>
+    </Screen>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1, backgroundColor: '#FFF8F5' },
+  body: { flex: 1 },
+  topBar: { paddingHorizontal: 18, paddingTop: 24, paddingBottom: 4 },
+  title: { fontSize: 22, fontWeight: 'bold', color: '#3D2C2E' },
+  subtitle: { fontSize: 12.5, color: '#8A7373', marginTop: 2 },
+  grid: { paddingHorizontal: 18, paddingTop: 12, paddingBottom: 24, gap: 12 },
+  visitorCard: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-    padding: 20,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    alignItems: 'center',
-    paddingBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginTop: 15,
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  visitorImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginHorizontal: 10,
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  visitorName: {
-    fontSize: 14,
-    color: colors.textPrimary,
-    textAlign: 'center',
-    marginTop: 5,
-  },
-  noVisitorsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  noVisitorsText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginVertical: 10,
-  },
-  noVisitorsSubText: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  heartIcon: {
-    marginVertical: 10,
-  },
-  refreshButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#fff',
+    borderRadius: 18,
     padding: 12,
-    borderRadius: 10,
-    marginTop: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F3E4E2',
   },
-  refreshButtonText: {
-    color: colors.buttonText,
-    fontSize: 16,
-    fontWeight: '500',
+  visitorImage: { width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: '#FF3D77', marginBottom: 8 },
+  visitorName: { fontSize: 13.5, fontWeight: '700', color: '#3D2C2E' },
+  visitorMeta: { fontSize: 11.5, color: '#8A7373', marginTop: 2 },
+  centerScreen: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  noUsersText: { fontSize: 18, fontWeight: 'bold', color: '#3D2C2E', marginTop: 12 },
+  noUsersSubText: { fontSize: 13, color: '#8A7373', textAlign: 'center', marginTop: 6, paddingHorizontal: 20 },
+  error: { fontSize: 14, color: '#E8877A', fontWeight: '600', textAlign: 'center', marginTop: 10, marginBottom: 20 },
+  buttonShadow: {
+    borderRadius: 999,
+    shadowColor: '#FF3D77',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4,
   },
-  error: {
-    textAlign: 'center',
-    color: '#FF4D4D',
-    fontSize: 16,
-    fontWeight: '500',
-    marginVertical: 20,
+  button: { paddingVertical: 13, paddingHorizontal: 34, borderRadius: 999 },
+  buttonText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
+  modalContainer: { flex: 1, backgroundColor: '#FFF8F5' },
+  modalBackButton: {
+    width: 38, height: 38, borderRadius: 19, backgroundColor: '#fff',
+    alignItems: 'center', justifyContent: 'center', marginBottom: 16,
+    borderWidth: 1, borderColor: '#F3E4E2',
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    padding: 20,
-  },
-  modalProfileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    alignSelf: 'center',
-    marginBottom: 20,
-    borderWidth: 3,
-    borderColor: colors.primary,
-  },
-  modalName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  modalDetail: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginVertical: 5,
-    textAlign: 'center',
-  },
-  closeButton: {
-    backgroundColor: colors.primary,
-    padding: 12,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 20,
-  },
-  closeButtonText: {
-    color: colors.buttonText,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  galleryImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginVertical: 5,
-    alignSelf: 'center',
-  },
-  footerSpacer: {
-    height: 20,
-  },
-  itemContainer: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    marginRight: 10,
-    marginVertical: 5,
-  },
-  itemText: {
-    fontSize: 14,
-    color: colors.textPrimary,
-    fontWeight: '500',
-  },
+  modalProfileImage: { width: 130, height: 130, borderRadius: 65, alignSelf: 'center', borderWidth: 3, borderColor: '#FF3D77' },
+  modalName: { fontSize: 22, fontWeight: 'bold', color: '#3D2C2E', textAlign: 'center', marginTop: 14 },
+  modalMeta: { fontSize: 13.5, color: '#8A7373', textAlign: 'center', marginTop: 4 },
+  card: { width: '100%', backgroundColor: '#fff', borderRadius: 22, padding: 18, marginTop: 20, borderWidth: 1, borderColor: '#F3E4E2' },
+  sectionTitle: { fontSize: 15, fontWeight: 'bold', color: '#3D2C2E' },
+  bodyText: { fontSize: 13.5, color: '#5A4A4C', marginTop: 6, lineHeight: 19 },
+  emptyText: { fontSize: 12.5, color: '#B5A3A3', marginTop: 6, fontStyle: 'italic' },
+  tag: { paddingHorizontal: 13, paddingVertical: 8, borderRadius: 12, marginRight: 8, marginTop: 8 },
+  tagText: { fontSize: 12.5, fontWeight: '600', color: '#3D2C2E' },
+  galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  galleryImage: { width: (width - 40 - 36 - 16) / 3, height: (width - 40 - 36 - 16) / 3, borderRadius: 12 },
 });
 
 export default VisitorsScreen;
+
+
+
+
+
