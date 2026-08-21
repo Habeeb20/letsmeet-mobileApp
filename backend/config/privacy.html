@@ -2,19 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Privacy Policy – [APP NAME]</title>
+    <title>Privacy Policy – Let's Meet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Link to the stylesheet -->
-    <link rel="stylesheet" href="./privacy.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #6c63ff, #4834d4);
+            color: white;
+            text-align: center;
+            padding: 60px 20px 50px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border-radius: 12px;
+            margin-top: -30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            margin-bottom: 36px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #4834d4;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+        }
+
+        p, li {
+            font-size: 1rem;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 22px;
+            margin-bottom: 12px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        a {
+            color: #6c63ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .disclaimer {
+            background: #fff8e6;
+            border-left: 4px solid #f0ad4e;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin-top: 40px;
+        }
+
+        .disclaimer p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 1.9rem;
+            }
+
+            .content {
+                margin-top: -20px;
+                padding: 30px 16px 50px;
+                border-radius: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <header class="hero">
         <h1>Privacy Policy</h1>
-        <p>Effective date: <strong>[INSERT DATE]</strong></p>
+        <p>Effective date: <strong>[INSERT DATE]</strong></p>
     </header>
 
     <main class="content">
-        <!-- ---- Begin the policy text (copy‑paste the policy from the previous answer) ---- -->
         <section>
             <h2>1. Information We Collect</h2>
             <p>… (the full table or bullet list from the policy) …</p>
@@ -66,8 +176,8 @@
         <section>
             <h2>9. How to Contact Us</h2>
             <p>
-                Email: <a href="mailto:Ademolawaliyu@gmail.com">Ademolawaliyu1@gmail.com</a><br>
-                Address: ikeja, lagos
+                Email: <a href="mailto:Ademolawaliyu1@gmail.com">Ademolawaliyu1@gmail.com</a><br>
+                Address: Ikeja, Lagos
             </p>
         </section>
 
@@ -79,15 +189,13 @@
         <section class="disclaimer">
             <p><strong>Disclaimer:</strong> This template is for informational purposes only …</p>
         </section>
-        <!-- ---- End of policy text ---- -->
     </main>
 
     <footer class="footer">
-        <p>&copy; <span id="year"></span> Let's meet. All rights reserved.</p>
+        <p>&copy; <span id="year"></span> Let's Meet. All rights reserved.</p>
     </footer>
 
     <script>
-        // Simple script to keep the copyright year current
         document.getElementById('year').textContent = new Date().getFullYear();
     </script>
 </body>
