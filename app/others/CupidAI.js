@@ -16,8 +16,6 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { KeyboardAvoidingView } from "react-native";
-import KeyboardSafeScreen, {keyboardSafeView} from "../others/KeyboardAvoidingView"
 // ── Matches the coral/cream palette used across Dashboard, Messages,
 // Matches, Visitors, LikedUsers, Favorite, Notifications ──
 const CREAM = "#FFF8F5";
@@ -36,7 +34,7 @@ const { height: SCREEN_H } = Dimensions.get("window");
 const PANEL_HEIGHT = Math.min(SCREEN_H * 0.75, 620);
 
 // TODO: point this at your actual dating-app AI backend, not the school one
-const BASE_URL = "https://your-api-domain.com/api";
+const BASE_URL =  "https://ai-api-taskflow.edirect.ng/api";
 const CHAT_ENDPOINT = `${BASE_URL}/public/chat`;
 
 const SUGGESTED_QUESTIONS = [
@@ -182,9 +180,7 @@ export default function CupidAI({ bottomOffset = 90 }) {
 
   return (
     <>
-    <KeyboardSafeScreen>
-      <KeyboardAvoidingView>
-          {/* Floating Action Button */}
+      {/* Floating Action Button */}
       <Animated.View
         pointerEvents={isOpen ? "none" : "auto"}
         style={{
@@ -563,9 +559,6 @@ export default function CupidAI({ bottomOffset = 90 }) {
           </KeyboardAvoidingView>
         </Animated.View>
       )}
-      </KeyboardAvoidingView>
-    </KeyboardSafeScreen>
-    
     </>
   );
 }
