@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Let's Meet – Meet Real People Around You</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #fff;
+      color: #2d2d2d;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ========== NAVBAR ========== */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 18px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+    }
+
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #FF6B6B;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: #2d2d2d;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #555;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #FF6B6B;
+    }
+
+    .nav-cta {
+      background: #FF6B6B;
+      color: white !important;
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-weight: 600;
+    }
+
+    .nav-cta:hover {
+      background: #ff5252;
+      color: white !important;
+    }
+
+    /* ========== HERO ========== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 5% 80px;
+      background: linear-gradient(135deg, #fff5f5 0%, #fff 50%, #fff0f0 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,107,107,0.15) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+      border-radius: 50%;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,107,107,0.1) 0%, transparent 70%);
+      bottom: 50px;
+      left: -80px;
+      border-radius: 50%;
+    }
+
+    .hero-content {
+      flex: 1;
+      max-width: 560px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #ffe0e0;
+      color: #FF6B6B;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: 3.4rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+
+    .hero h1 span {
+      color: #FF6B6B;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: #666;
+      margin-bottom: 36px;
+      max-width: 440px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: #FF6B6B;
+      color: white;
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: #ff5252;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(255, 107, 107, 0.5);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #FF6B6B;
+      border: 2px solid #FF6B6B;
+    }
+
+    .btn-secondary:hover {
+      background: #fff5f5;
+      transform: translateY(-3px);
+    }
+
+    .hero-visual {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .phone-mockup {
+      width: 280px;
+      height: 560px;
+      background: linear-gradient(160deg, #FF6B6B, #ff8e8e);
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: 0 30px 60px rgba(255, 107, 107, 0.35);
+      position: relative;
+      transform: rotate(6deg);
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 32px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .avatar-circle {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, #FF6B6B, #ff9a9a);
+      border-radius: 50%;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+    }
+
+    .phone-screen h3 {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+      color: #2d2d2d;
+    }
+
+    .phone-screen p {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 24px;
+    }
+
+    .match-btn {
+      background: #FF6B6B;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    /* ========== FEATURES ========== */
+    .features {
+      padding: 100px 5%;
+      background: white;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-title h2 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .section-title p {
+      color: #777;
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 20px;
+      padding: 36px 28px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(255, 107, 107, 0.12);
+      border-color: #ffd5d5;
+    }
+
+    .feature-icon {
+      width: 70px;
+      height: 70px;
+      background: #fff0f0;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    /* ========== HOW IT WORKS ========== */
+    .how-it-works {
+      padding: 100px 5%;
+      background: linear-gradient(180deg, #fff5f5 0%, #fff 100%);
+    }
+
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .step {
+      flex: 1;
+      min-width: 220px;
+      max-width: 280px;
+      text-align: center;
+      position: relative;
+    }
+
+    .step-number {
+      width: 56px;
+      height: 56px;
+      background: #FF6B6B;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+    }
+
+    .step h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    /* ========== CTA ========== */
+    .cta {
+      padding: 100px 5%;
+      text-align: center;
+      background: linear-gradient(135deg, #FF6B6B, #ff8e8e);
+      color: white;
+    }
+
+    .cta h2 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      font-size: 1.2rem;
+      opacity: 0.95;
+      margin-bottom: 36px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta .btn-primary {
+      background: white;
+      color: #FF6B6B;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .cta .btn-primary:hover {
+      background: #fff5f5;
+      transform: translateY(-3px);
+    }
+
+    /* ========== FOOTER ========== */
+    footer {
+      background: #1a1a1a;
+      color: #aaa;
+      padding: 50px 5% 30px;
+      text-align: center;
+    }
+
+    footer .logo {
+      color: #FF6B6B;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    footer p {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    footer a {
+      color: #FF6B6B;
+      text-decoration: none;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 900px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 140px;
+      }
+
+      .hero-content {
+        max-width: 100%;
+        margin-bottom: 50px;
+      }
+
+      .hero p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-buttons {
+        justify-content: center;
+      }
+
+      .phone-mockup {
+        transform: rotate(0);
+        width: 240px;
+        height: 480px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 2.4rem;
+      }
+
+      .section-title h2 {
+        font-size: 1.9rem;
+      }
+
+      .cta h2 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="logo">Let's <span>Meet</span></div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#cta" class="nav-cta">Get Started</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="badge">❤️ Real connections nearby</div>
+      <h1>Meet real people<br><span>around you</span></h1>
+      <p>Discover meaningful connections with people near you. Swipe, match, and start real conversations today.</p>
+      <div class="hero-buttons">
+        <a href="#cta" class="btn btn-primary">Get Started Free</a>
+        <a href="#how" class="btn btn-secondary">See How it Works</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="phone-mockup">
+        <div class="phone-screen">
+          <div class="avatar-circle">👩</div>
+          <h3>Sarah, 24</h3>
+          <p>2 km away • Loves hiking & coffee</p>
+          <button class="match-btn">It's a Match ❤️</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="section-title">
+      <h2>Why people love Let's Meet</h2>
+      <p>Everything you need to find real connections, not just endless swipes.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📍</div>
+        <h3>Nearby Matches</h3>
+        <p>Find people around you in real time. Meet for coffee, walks, or spontaneous hangouts.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Real Conversations</h3>
+        <p>Chat with matches instantly. No pressure, just genuine and fun interactions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Safe & Private</h3>
+        <p>Your privacy comes first. Verified profiles and smart safety tools keep you protected.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✨</div>
+        <h3>Smart Matching</h3>
+        <p>Our algorithm connects you with people who share your interests and vibes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works" id="how">
+    <div class="section-title">
+      <h2>How it works</h2>
+      <p>Three simple steps to start meeting amazing people.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Create your profile</h3>
+        <p>Add your best photos and tell us a bit about yourself in under 2 minutes.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Discover people nearby</h3>
+        <p>Browse real people around you and swipe on the ones you like.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Match & meet</h3>
+        <p>When you both like each other — it's a match! Start chatting and plan to meet.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="cta" id="cta">
+    <h2>Ready to meet someone new?</h2>
+    <p>Join thousands of people already making real connections with Let's Meet.</p>
+    <a href="#" class="btn btn-primary">Download Let's Meet</a>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="logo">Let's Meet</div>
+    <p>Meet real people around you.</p>
+    <p style="margin-top: 20px;">
+      <a href="/privacy">Privacy Policy</a> · 
+      <a href="#">Terms of Service</a>
+    </p>
+    <p style="margin-top: 12px;">&copy; <span id="year"></span> Let's Meet. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -129,6 +129,8 @@ app.use(helmet());
 
 app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
 app.use('/privacy.html', express.static(path.join(__dirname, 'public', 'privacy.html')));
+app.use('/landingpage.html', express.static(path.join(__dirname, 'public', 'landingpage.html')));
+
 app.use('/', privacyRoute);
 
 // Routes
