@@ -22,7 +22,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.ademolawaliyu.letsmeet"
+      "package": "com.ademolawaliyu.letsmeetapp",
+      "versionCode": 2
     },
     "web": {
       "bundler": "metro",
@@ -44,3 +45,13 @@
     }
   }
 }
+
+
+
+
+
+
+
+
+
+

@@ -19,6 +19,10 @@ router.get("/landingpage", (req, res) => {
   // The file lives at ./public/privacy.html
   res.sendFile(path.join(__dirname, "..", "config", "landingpage.html"));
 });
+router.get("/childsafety", (req, res) => {
+  // The file lives at ./public/privacy.html
+  res.sendFile(path.join(__dirname, "..", "config", "childsafety.html"));
+});
 
 export default router;
 

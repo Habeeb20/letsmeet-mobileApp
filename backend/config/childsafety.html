@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Child Safety Standards — Let's Meet</title>
+<style>
+  :root {
+    --accent: #E63950;
+    --accent-dark: #B8213A;
+    --ink: #1A1520;
+    --muted: #6B6470;
+    --bg: #FFF8F9;
+    --card: #FFFFFF;
+    --border: #F0E1E4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    padding: 0 0 80px;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: white;
+    padding: 64px 24px 56px;
+    text-align: center;
+  }
+
+  header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  header h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+
+  header p {
+    font-size: 1.05rem;
+    opacity: 0.92;
+    max-width: 560px;
+    margin: 0 auto;
+    color:white
+  }
+
+  .container {
+    max-width: 760px;
+    margin: -32px auto 0;
+    padding: 0 20px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 16px rgba(230, 57, 80, 0.06);
+  }
+
+  .zero-tolerance {
+    background: #FFF1F3;
+    border: 1px solid #FBD0D8;
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+
+  .zero-tolerance h2 {
+    color: var(--accent-dark);
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+
+  h3 {
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin: 20px 0 8px;
+    color: var(--ink);
+  }
+
+  p {
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-size: 0.97rem;
+  }
+
+  ul {
+    margin: 10px 0 16px 20px;
+    color: var(--muted);
+    font-size: 0.97rem;
+  }
+
+  li {
+    margin-bottom: 8px;
+  }
+
+  .step-list {
+    counter-reset: step;
+    list-style: none;
+    margin-left: 0;
+  }
+
+  .step-list li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 16px;
+  }
+
+  .step-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 26px;
+    height: 26px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .contact-box {
+    background: var(--ink);
+    color: white;
+    border-radius: 16px;
+    padding: 28px 32px;
+    text-align: center;
+  }
+
+  .contact-box h2 {
+    color: white;
+    font-size: 1.15rem;
+  }
+
+  .contact-box p {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.92rem;
+  }
+
+  .contact-box a {
+    display: inline-block;
+    margin-top: 14px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 12px 28px;
+    border-radius: 10px;
+  }
+
+  .meta {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin-top: 20px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="badge">Trust &amp; Safety</span>
+  <h1>Child Safety Standards</h1>
+  <p>Let's Meet's public commitment against child sexual abuse and exploitation (CSAE), and how we prevent, detect, and report it.</p>
+</header>
+
+<div class="container">
+
+  <div class="zero-tolerance">
+    <h2>Zero Tolerance Policy</h2>
+    <p style="margin-bottom:0;">
+      Let's Meet has zero tolerance for child sexual abuse and exploitation (CSAE) of any kind.
+      Our platform is strictly for adults aged 18 and older, and any content, account, or behavior
+      that sexualizes, exploits, endangers, or otherwise harms a minor is immediately removed and
+      reported to the relevant authorities, including the National Center for Missing &amp; Exploited
+      Children (NCMEC) and local law enforcement where applicable.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Age Requirement</h2>
+    <p>
+      Let's Meet is an 18+ platform. Users must confirm they are at least 18 years old during
+      account registration. Accounts found or reported to belong to a minor are suspended
+      immediately upon detection, pending investigation.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>How We Prevent CSAE</h2>
+    <ul>
+      <li>Mandatory age confirmation at signup, with account suspension for any account later found to misrepresent age.</li>
+      <li>Profile and content moderation, including image review for uploaded photos.</li>
+      <li>In-app reporting and blocking tools available on every profile, chat, and piece of content.</li>
+      <li>Proactive account review for behavior patterns associated with grooming or exploitation.</li>
+      <li>Removal of any account, message, or media found to contain or facilitate CSAE, without delay.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>How to Report a Concern</h2>
+    <p>If you encounter content or behavior on Let's Meet that concerns you regarding child safety, please report it right away using any of the following methods:</p>
+    <ol class="step-list">
+      <li><strong>In-app report:</strong> Tap the report icon on any profile, message, or piece of content and select the relevant concern category.</li>
+      <li><strong>Email:</strong> Send details, screenshots, and the reported user's profile information to our safety team (contact below).</li>
+      <li><strong>Immediate danger:</strong> If a child is in immediate danger, contact your local law enforcement or emergency services first, then report to us.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Our Response Process</h2>
+    <p>Every CSAE-related report is treated as high priority. Once received, we:</p>
+    <ul>
+      <li>Immediately suspend the reported account pending review.</li>
+      <li>Preserve relevant account data and content as evidence.</li>
+      <li>Escalate confirmed cases to the National Center for Missing &amp; Exploited Children (NCMEC) via their CyberTipline, and to local law enforcement as required by applicable law.</li>
+      <li>Permanently ban confirmed violators from the platform.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Legal Compliance</h2>
+    <p>
+      Let's Meet complies with all applicable child protection laws, including reporting
+      obligations under the laws of Nigeria and, where applicable to our users and hosting
+      providers, U.S. federal law (18 U.S.C. §2258A) regarding mandatory reporting of CSAE to
+      NCMEC.
+    </p>
+  </div>
+
+  <div class="contact-box">
+    <h2>Report Directly to Our Safety Team</h2>
+    <p>For CSAE reports, safety concerns, or law enforcement requests</p>
+    <a href="mailto:codequor@gmail.com?subject=Child%20Safety%20Report%20-%20Let%27s%20Meet">codequor@gmail.com</a>
+  </div>
+
+  <p class="meta">Let's Meet · Child Safety Standards · Last updated August 2026</p>
+
+</div>
+
+</body>
+</html>
